@@ -29,47 +29,51 @@ int main (int argc, char* argv[]) {
   }
   else if (argc == 6)
   {
-   	float  sum = 0;
    	functionid = atoi(argv[1]);
    	a  = atoi(argv[2]);
    	b = atoi(argv[3]);
    	n = atoi(argv[4]);
    	intensity = atoi(argv[5]);
-   	float  sum =0;
+   	float  sum =0.0;
+   	float answer = 0.0;
     switch (functionid)
    	{
    		case 1:
    		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n)
-   			function = f1(f,intensity);
+   			float f = a+(i*0.5)*((b - a)/n);
+   			float function = f1(f,intensity);
    			sum = sum + function;
    		}
-   		float answer  = ((b - a)/n) * sum
+   		answer  = ((b - a)/n) * sum;
    		cout << answer;
+   		return 0;
    		case 2:
    		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n)
-   			function = f2(f,intensity);
+   			float f = a+(i*0.5)*((b - a)/n);
+   			float function = f2(f,intensity);
    			sum = sum + function;
    		}
-   		float answer  = ((b - a)/n) * sum
+   		answer  = ((b - a)/n) * sum;
    		cout << answer;
+   		return 0;
    		case 3:
    		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n)
-   			function = f3(f,intensity);
+   			float f = a+(i*0.5)*((b - a)/n);
+   			float function = f3(f,intensity);
    			sum = sum + function;
    		}
-   		float answer  = ((b - a)/n) * sum
+   		answer  = ((b - a)/n) * sum;
    		cout << answer;
+   		return 0;
    		case 4:
    		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n)
-   			function = f4(f,intensity);
+   			float f = a+(i*0.5)*((b - a)/n);
+   			float function = f4(f,intensity);
    			sum = sum + function;
    		}
-   		float answer  = ((b - a)/n) * sum
+   		answer  = ((b - a)/n) * sum;
    		cout << answer;
+   		return 0;
    	} 
   }
   else {
