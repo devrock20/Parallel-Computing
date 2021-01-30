@@ -1,2 +1,1 @@
-# Parallel-Computing
-Repo for Parallel Computing Projects
+# Sys Name Activity
