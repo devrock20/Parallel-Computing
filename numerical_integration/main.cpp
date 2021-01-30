@@ -4,6 +4,8 @@
 #include <chrono>
 #include <string>
 using namespace std;
+using chrono::system_clock;
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +22,8 @@ float f4(float x, int intensity);
 
   
 int main (int argc, char* argv[]) {
-  int functionid,a,b,n,intensity;
+  int functionid;
+  float a,b,n,intensity;
 
   if (argc < 6) 
   {
@@ -34,42 +37,61 @@ int main (int argc, char* argv[]) {
    	b = atoi(argv[3]);
    	n = atoi(argv[4]);
    	intensity = atoi(argv[5]);
-   	float  sum =0.0;
-   	float answer = 0.0;
+   	float  sum =0.000;
+   	float answer = 0.000;
+   	chrono::seconds sec(1);
+   	
     switch (functionid)
    	{
    		case 1:
-   		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n);
-   			float function = f1(f,intensity);
-   			sum = sum + function;
+   		for (int i=0;i<=n-1;i++){
+   			float function = (a+i+0.5)*((b - a)/n);
+   			system_clock::time_point before_integration = system_clock::now();
+   			float integral = f1(function,intensity);
+   			system_clock::time_point after_integration =  system_clock::now();
+   			sum = sum + integral;
+   		        chrono::duration time_taken = after_integration - before_integration;
+   		        cerr << time_taken.count();
+   	         
    		}
    		answer  = ((b - a)/n) * sum;
    		cout << answer;
    		return 0;
    		case 2:
-   		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n);
-   			float function = f2(f,intensity);
-   			sum = sum + function;
+   		for (int i=0;i<=n-1;i++){
+   		        float function = (a+i+0.5)*((b - a)/n);
+   			system_clock::time_point before_integration = system_clock::now();
+   			float integral = f2(function,intensity);
+   			system_clock::time_point after_integration =  system_clock::now();
+   			sum = sum + integral;
+   		        chrono::duration time_taken = after_integration - before_integration;
+   		        cerr << time_taken.count();
    		}
    		answer  = ((b - a)/n) * sum;
    		cout << answer;
    		return 0;
    		case 3:
-   		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n);
-   			float function = f3(f,intensity);
-   			sum = sum + function;
+   		for (int i=0;i<=n-1;i++){
+   		        float function = (a+i+0.5)*((b - a)/n);
+   			system_clock::time_point before_integration = system_clock::now();
+   			float integral = f3(function,intensity);
+   			system_clock::time_point after_integration =  system_clock::now();
+   			sum = sum + integral;
+   		        chrono::duration time_taken = after_integration - before_integration;
+   		        cerr << time_taken.count();
    		}
    		answer  = ((b - a)/n) * sum;
    		cout << answer;
    		return 0;
    		case 4:
-   		for (int i=0;i<n-1;i++){
-   			float f = a+(i*0.5)*((b - a)/n);
-   			float function = f4(f,intensity);
-   			sum = sum + function;
+   		for (int i=0;i<=n-1;i++){
+   			float function = (a+i+0.5)*((b - a)/n);
+   			system_clock::time_point before_integration = system_clock::now();
+   			float integral = f4(function,intensity);
+   			system_clock::time_point after_integration =  system_clock::now();
+   			sum = sum + integral;
+   		        chrono::duration time_taken = after_integration - before_integration;
+   		        cerr << time_taken.count();
    		}
    		answer  = ((b - a)/n) * sum;
    		cout << answer;
