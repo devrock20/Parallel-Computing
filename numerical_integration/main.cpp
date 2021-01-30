@@ -35,25 +35,46 @@ int main (int argc, char* argv[]) {
    	b = atoi(argv[3]);
    	n = atoi(argv[4]);
    	intensity = atoi(argv[5]);
-
-   for (int i=0;i<=n-1;i++)
-   		{
-   			float function = a+(i*0.5)*((b - a)/n);
-   			sum = sum + function;
-   		}
-
-   float x = ((b - a)/n) * sum;
-   switch (functionid)
+   	float  sum =0;
+    switch (functionid)
    	{
    		case 1:
-   		f1(x,intensity);
+   		for (int i=0;i<n-1;i++){
+   			float f = a+(i*0.5)*((b - a)/n)
+   			function = f1(f,intensity);
+   			sum = sum + function;
+   		}
+   		float answer  = ((b - a)/n) * sum
+   		cout << answer;
    		case 2:
-   		f2(x,intensity);
+   		for (int i=0;i<n-1;i++){
+   			float f = a+(i*0.5)*((b - a)/n)
+   			function = f2(f,intensity);
+   			sum = sum + function;
+   		}
+   		float answer  = ((b - a)/n) * sum
+   		cout << answer;
    		case 3:
-   		f3(x,intensity);
+   		for (int i=0;i<n-1;i++){
+   			float f = a+(i*0.5)*((b - a)/n)
+   			function = f3(f,intensity);
+   			sum = sum + function;
+   		}
+   		float answer  = ((b - a)/n) * sum
+   		cout << answer;
    		case 4:
-   		f4(x,intensity);
+   		for (int i=0;i<n-1;i++){
+   			float f = a+(i*0.5)*((b - a)/n)
+   			function = f4(f,intensity);
+   			sum = sum + function;
+   		}
+   		float answer  = ((b - a)/n) * sum
+   		cout << answer;
    	} 
+  }
+  else {
+  	cerr<<"Incorrect number of arguments passed usage: "<<argv[0]<<" <functionid> <a> <b> <n> <intensity>"<<std::endl;
+    return -1;
   }
   return 0;
 }
