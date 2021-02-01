@@ -5,7 +5,6 @@
 #include <string>
 
 using namespace std;
-using chrono::system_clock;
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,12 +28,8 @@ float getSummation (absFun function, float a, float b, float n, float intensity)
   float answer = 0.000;
   for (int i=0; i<=n-1; i++){
   	float expression = (a + (i + 0.5)*((b - a)/n));
-  	system_clock::time_point before_integration = system_clock::now();
   	float integral = function(expression,intensity);
-  	system_clock::time_point after_integration =  system_clock::now();
-  	sum = sum + integral;
-    system_clock::duration time_taken = after_integration - before_integration;
-    cerr << time_taken.count();    
+  	sum = sum + integral;   
   }
   return sum;
 }
@@ -43,6 +38,9 @@ float getSummation (absFun function, float a, float b, float n, float intensity)
 void calcAndDisplayIntegral(float sum, float a, float b, float n) {
   cout << ((b - a)/n) * sum;
 }
+
+// calculates time difference
+
 
 int main (int argc, char* argv[]) {
   //safety checks
@@ -54,7 +52,6 @@ int main (int argc, char* argv[]) {
 	cerr <<"Incorrect number of arguments passed usage: "<< argv[0] <<" <functionid> <a> <b> <n> <intensity>"<< endl;
     return -1;
   }
-
   int functionid = stoi(argv[1]);
   float a = stoi(argv[2]);
   float b = stoi(argv[3]);
@@ -63,10 +60,13 @@ int main (int argc, char* argv[]) {
   
   chrono::seconds sec(1);
   float summation;
+  auto before_integration = chrono::steady_clock::now()
   switch (functionid) {
   	case 1:
   	  summation = getSummation((absFun)f1, a, b, n, intensity);
       calcAndDisplayIntegral(summation, a, b, n);
+      auto after_integration = chrono::steady_clock::now();
+      cout << chrono::duration_cast < chrono::seconds < (after_integration  - before_integration).count() 
   	  break;
   	case 2:
   	  summation = getSummation((absFun)f2, a, b, n, intensity);
