@@ -66,39 +66,31 @@ int main (int argc, char* argv[]) {
   
   float summation;
   auto before_integration = chrono::system_clock::now();
-  
-  
   switch (functionid) {
   	case 1:
     {
   	  summation = getSummation((absFun)f1, a, b, n, intensity);
-      calcAndDisplayIntegral(summation, a, b, n);
-      calcAndDisplayTime(before_integration);
   	  break;
     }
   	case 2:
     {
   	  summation = getSummation((absFun)f2, a, b, n, intensity);
-      calcAndDisplayIntegral(summation, a, b, n);
-      calcAndDisplayTime(before_integration);
   	  break;
     }
   	case 3:
     {
   	  summation = getSummation((absFun)f3, a, b, n, intensity);
-      calcAndDisplayIntegral(summation, a, b, n);
-      calcAndDisplayTime(before_integration);
   	  break;
     }  
   	case 4:
     {
   	  summation = getSummation((absFun)f4, a, b, n, intensity);
-      calcAndDisplayIntegral(summation, a, b, n);
-      calcAndDisplayTime(before_integration);
   	  break;
     }
     default:
       cerr<<"Unknown function id passed: " << functionid << endl;
-  } 
+  }
+  calcAndDisplayIntegral(summation, a, b, n);
+  calcAndDisplayTime(before_integration); 
   return 0;
 }
