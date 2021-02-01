@@ -39,7 +39,12 @@ void calcAndDisplayIntegral(float sum, float a, float b, float n) {
   cout << ((b - a)/n) * sum;
 }
 
-// calculates time difference
+// calculates and displays time difference
+void calcAndDisplayTime(chrono::time_point<chrono::system_clock> before_integration){
+   auto after_integration = chrono::system_clock::now();
+   cerr << chrono::duration_cast < chrono::seconds> (after_integration  - before_integration).count();
+
+}
 
 
 int main (int argc, char* argv[]) {
@@ -58,27 +63,30 @@ int main (int argc, char* argv[]) {
   float n = stoi(argv[4]);
   float intensity = stoi(argv[5]);
   
-  chrono::seconds sec(1);
   float summation;
-  auto before_integration = chrono::steady_clock::now()
+  auto before_integration = chrono::system_clock::now();
+  
+  
   switch (functionid) {
   	case 1:
   	  summation = getSummation((absFun)f1, a, b, n, intensity);
       calcAndDisplayIntegral(summation, a, b, n);
-      auto after_integration = chrono::steady_clock::now();
-      cout << chrono::duration_cast < chrono::seconds < (after_integration  - before_integration).count() 
+       calcAndDisplayTime(before_integration);
   	  break;
   	case 2:
   	  summation = getSummation((absFun)f2, a, b, n, intensity);
       calcAndDisplayIntegral(summation, a, b, n);
+      calcAndDisplayTime(before_integration);
   	  break;
   	case 3:
   	  summation = getSummation((absFun)f3, a, b, n, intensity);
       calcAndDisplayIntegral(summation, a, b, n);
+      calcAndDisplayTime(before_integration);
   	  break;
   	case 4:
   	  summation = getSummation((absFun)f4, a, b, n, intensity);
       calcAndDisplayIntegral(summation, a, b, n);
+      calcAndDisplayTime(before_integration);
   	  break;
     default:
       cerr<<"Unknown function id passed: " << functionid << endl;
