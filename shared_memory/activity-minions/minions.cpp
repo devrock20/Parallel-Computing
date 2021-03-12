@@ -9,13 +9,17 @@ void minion(int m){
   cout << "Hello! I am minion "<< m << "\n";
 }
 
+void  overlord_thread(){
+  cout << "hello minions! I am the Overlord!";
+}
+
 
 int main (int argc, char** argv) {
   if (argc < 2) {
     cerr<<"usage: "<<argv[0]<<" <nbminions>\n";
     return -1;
   }
-  float m = stoi(argv[0]);
+  float m = stoi(argv[1]);
   vector <std::thread > minion_threads;
   for (int i=0; i<m; ++i) 
   	{ 
@@ -26,7 +30,7 @@ int main (int argc, char** argv) {
    {
    	t.join ();
   }
-  thread overlord_thread ("hello minions! I am the Overlord!")
+  thread overlord_thread (overlord_thread)
   thread.join()
 
   
