@@ -30,8 +30,8 @@ int main (int argc, char** argv) {
    {
    	t.join ();
   }
-  thread overlord_thread (overlord_thread)
-  thread.join()
+  thread overlord (overlord_thread);
+  overlord.join();
 
   
   return 0;
