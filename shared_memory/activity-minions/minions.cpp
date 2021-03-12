@@ -20,11 +20,11 @@ int main (int argc, char** argv) {
     return -1;
   }
   float m = stoi(argv[1]);
-  vector <std::thread > minion_threads;
+  vector <thread > minion_threads;
   for (int i=0; i<m; ++i) 
   	{ 
   		thread  minion_thread (minion,i);
-  		minion_threads.push_back(std::move(minion_thread ));
+  		minion_threads.push_back(move(minion_thread ));
   	}
   for (auto & t : minion_threads)
    {
