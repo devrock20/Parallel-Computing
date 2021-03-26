@@ -2,6 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <thread>
+#include <mutex>
+
 
 #include "Dictionary.hpp"
 #include "MyHashtable.hpp"
@@ -45,6 +48,17 @@ std::vector<std::vector<std::string>> tokenizeLyrics(const std::vector<std::stri
   return ret;
 }
 
+void hashtable_populate(std::vector<std::string> filecontent,
+                        Dictionary<std::string, int>& dict,
+                        std::mutex &mut){
+  std::lock_guard<std::mutex> lg(mut);
+  
+    for (auto & w : filecontent) {
+      int count = dict.get(w);
+      ++count;
+      dict.set(w, count);
+    }
+}
 
 
 int main(int argc, char **argv)
@@ -72,10 +86,29 @@ int main(int argc, char **argv)
 
   MyHashtable<std::string, int> ht;
   Dictionary<std::string, int>& dict = ht;
+  std::mutex mu;
+
+
+  std::vector<std::thread> filethreads;
+  auto start =std::chrono::steady_clock::now();
+  for (int i =0;i<wordmap.size();i++){
+    filethreads.push_back(std::thread  (hashtable_populate,wordmap.at(i),std::ref(ht),std::ref(mu)));
+  }
+
+  for (auto &t: filethreads){
+    t.join();
+  }
+
+  auto stop = std::chrono::steady_clock::now();
+  std::chrono::duration<double> time_elapsed = stop-start;
+
+
+
 
 
 
   // write code here
+
 
 
 
