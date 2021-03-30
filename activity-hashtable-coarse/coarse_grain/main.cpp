@@ -56,9 +56,9 @@ void hashtable_populate(vector<string> filecontent,
   
   
     for (auto & w : filecontent) {
+      mut.lock();
       int count = dict.get(w);
       ++count;
-      mut.lock();
       dict.set(w, count);
       mut.unlock();
     }
