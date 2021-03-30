@@ -53,12 +53,14 @@ vector<vector<string>> tokenizeLyrics(const vector<string> files) {
 void hashtable_populate(vector<string> filecontent,
                         Dictionary<string, int>& dict,
                         mutex &mut){
-  lock_guard<mutex> lg(mut);
+  
   
     for (auto & w : filecontent) {
       int count = dict.get(w);
       ++count;
+      mut.lock();
       dict.set(w, count);
+      mut.unlock();
     }
 }
 
