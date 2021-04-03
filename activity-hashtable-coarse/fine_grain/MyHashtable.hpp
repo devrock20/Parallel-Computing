@@ -28,6 +28,9 @@ protected:
   int count;
   double loadFactor;
   std::vector<Node<K,V>*> table;
+  std::mutex mut;
+  std::condition_variable_any cond;
+
 
   struct hashtable_iter : public dict_iter {
     MyHashtable& mt;
@@ -104,6 +107,7 @@ public:
    * @return node of type Node at key
    */
   virtual V get(const K& key) const {
+    mut.lock();
     std::size_t index = std::hash<K>{}(key) % this->capacity;
     index = index < 0 ? index + this->capacity : index;
     const Node<K,V>* node = this->table[index];
@@ -113,6 +117,7 @@ public:
 	      return node->value;
       node = node->next;
     }
+    mut.unlock();
     return V();
   }
 
@@ -122,6 +127,7 @@ public:
    * @param value new value of node
    */
   virtual void set(const K& key, const V& value) {
+    mut.lock();
     std::size_t index = std::hash<K>{}(key) % this->capacity;
     index = index < 0 ? index + this->capacity : index;
     Node<K,V>* node = this->table[index];
@@ -142,6 +148,7 @@ public:
     if (((double)this->count)/this->capacity > this->loadFactor) {
       this->resize(this->capacity * 2);
     }
+    mut.unlock();
   }
 
   /**

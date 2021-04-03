@@ -45,6 +45,17 @@ std::vector<std::vector<std::string>> tokenizeLyrics(const std::vector<std::stri
   return ret;
 }
 
+void hashtable_populate(vector<string> filecontent,
+                        Dictionary<string, int>& dict){
+  
+  
+    for (auto & w : filecontent) {
+      int count = dict.get(w);
+      ++count;
+      dict.set(w, count);
+    }
+}
+
 
 
 int main(int argc, char **argv)
@@ -76,6 +87,19 @@ int main(int argc, char **argv)
 
 
   // write code here
+
+  vector<thread> filethreads;
+  auto start =chrono::steady_clock::now();
+  for (int i =0;i<wordmap.size();i++){
+    filethreads.push_back(thread  (hashtable_populate,wordmap.at(i),ref(ht)));
+  }
+
+  for (auto &t: filethreads){
+    t.join();
+  }
+
+  auto stop = chrono::steady_clock::now();
+  chrono::duration<double> time_elapsed = stop-start;
 
 
 
