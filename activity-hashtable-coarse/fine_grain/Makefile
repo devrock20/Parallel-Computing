@@ -1,5 +1,5 @@
 SRCS = main.cpp
-HEADER=MyHashtable.hpp Dictionary.hpp 
+HEADER=HashTable.h
 EXE = main
 
 # Everything below that should not have to change ever.
