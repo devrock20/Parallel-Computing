@@ -116,7 +116,7 @@ int main(int argc, char **argv)
 
   // Do not touch this, need for test cases
   cout << hm.get(testWord) << endl;
-  
+
   cerr << time_elapsed.count() << "\n";
 
   return 0;

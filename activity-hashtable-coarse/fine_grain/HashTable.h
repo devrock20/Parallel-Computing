@@ -104,7 +104,7 @@ template <typename K, typename V, typename F = std::hash<K>>
 class HashTable
 {
 public:
-    HashTable(size_t hashSize_ = 1031) : hashSize(hashSize_)
+    HashTable(size_t hashSize_ = 100000) : hashSize(hashSize_)
     {
         hashTable = new HashBucket<K, V>[hashSize];
         mu_wrapper = new mutex_wrapper[256];
