@@ -213,7 +213,7 @@ private:
     HashBucket<K, V> *hashEntries;
     F hashFn;
     const size_t hashSize;
-    size_t MAX_MUTEX = 65568;
+    size_t MAX_MUTEX = 256;
     mutex_wrapper *mu_wrapper;
 };
 
