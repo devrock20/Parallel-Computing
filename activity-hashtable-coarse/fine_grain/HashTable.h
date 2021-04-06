@@ -107,7 +107,7 @@ public:
     HashTable(size_t hashSize_ = 100000) : hashSize(hashSize_)
     {
         hashTable = new HashBucket<K, V>[hashSize];
-        mu_wrapper = new mutex_wrapper[256];
+        mu_wrapper = new mutex_wrapper[MAX_MUTEX];
     }
 
     HashTable(const HashTable &) = delete;
@@ -132,7 +132,7 @@ private:
     HashBucket<K, V> *hashTable;
     F hashFn;
     const size_t hashSize;
-    size_t MAX_MUTEX = 256;
+    size_t MAX_MUTEX = 65568;
     mutex_wrapper *mu_wrapper;
 };
 
