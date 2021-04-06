@@ -53,13 +53,19 @@ vector<vector<string>> tokenizeLyrics(const vector<string> files)
 }
 
 void hashtable_populate(vector<string> filecontent,
-                        HashTable<string, int> &dict)
+                        HashTable<string, int> &ht,
+                        HashTable<string, int> &result)
 {
-
   for (auto &w : filecontent)
   {
-    dict.update(w);
+    ht.update(w);
   }
+  vector<HashNode<string, int>*> entries = ht.getEntries();
+  for (auto &entry : entries)
+  {
+    result.update(entry->getKey(), entry->getValue());
+  }
+  ht.clear();
 }
 
 int main(int argc, char **argv)
@@ -87,13 +93,14 @@ int main(int argc, char **argv)
   // Tokenize Lyrics
   auto wordmap = tokenizeLyrics(files);
 
-  HashTable<string, int> hm;
+  HashTable<string, int>* ht = new HashTable<string, int>[wordmap.size()];
+  HashTable<string, int> result;
 
   vector<thread> filethreads;
   auto start = chrono::steady_clock::now();
   for (int i = 0; i < wordmap.size(); i++)
   {
-    filethreads.push_back(thread(hashtable_populate, wordmap.at(i), ref(hm)));
+    filethreads.push_back(thread(hashtable_populate, wordmap.at(i), ref(ht[i]), ref(result)));
   }
 
   for (auto &t : filethreads)
@@ -112,10 +119,9 @@ int main(int argc, char **argv)
   //   if (it.second > thresholdCount)
   //     cout << it.first << " " << it.second << endl;
   // }
-  
 
   // Do not touch this, need for test cases
-  cout << hm.get(testWord) << endl;
+  cout << result.get(testWord) << endl;
 
   cerr << time_elapsed.count() << "\n";
 
