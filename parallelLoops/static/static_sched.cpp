@@ -6,6 +6,7 @@
 #include <cmath>
 #include "seq_loop.hpp"
 #include "thread"
+#include <vector>
 using namespace std;
 #ifdef __cplusplus
 extern "C"
@@ -25,39 +26,41 @@ extern "C"
 typedef float (*absFun)(float x, int intensity);
 SeqLoop sl;
 
-void single_thread_action(int i, float n, int nbthreads, float a, float b, absFun function, float intensity, float &localSum)
+void single_thread_action(int i, float n, int nbthreads, float a, float b, absFun function, float intensity, float &sum)
 {
-  sl.parfor(i, n, nbthreads,
-            [&](int count) -> void {
-              float expression = (a + (count + 0.5) * ((b - a) / n));
-              float integral = function(expression, intensity);
-              localSum += integral;
-            });
+
+  sl.parfor<float>(
+      i, n, nbthreads,
+      [&](float &localSum) -> void {
+        localSum = 0.00;
+      },
+      [&](int count, float &localSum) -> void {
+        float expression = (a + (count + 0.5) * ((b - a) / n));
+        float integral = function(expression, intensity);
+        localSum += integral;
+      },
+      [&](float &localSum) -> void {
+        sum += localSum;
+      });
 }
 
 float getSummation(absFun function, float a, float b, float n, float intensity, int nbthreads)
 {
   float sum = 0.000;
-  float answer = 0.000;
-  sl.parfor<float>(
+  vector<thread> filethreads;
+  sl.parfor(
       0, nbthreads, 1,
-      [&](float &localSum) -> void {
-        localSum = 0;
-      },
-      [&](int i, float &localSum) -> void {
-        thread(single_thread_action, i, n, nbthreads, a, b, function, intensity, ref(localSum));
-      },
-      [&](float localSum) -> void {
-        sum += localSum;
+      [&](int i) -> void {
+        filethreads.push_back(thread(single_thread_action, i, n, nbthreads, a, b, function, intensity, ref(sum)));
+        filethreads.at(i).join();
       });
-
   return sum;
 }
 
 // calculates and displays the integral
 void calcAndDisplayIntegral(float sum, float a, float b, float n)
 {
-  cout << ((b - a) / n) * sum;
+  cout << ((b - a) / n) * sum << endl;
 }
 
 // calculates and displays time difference
@@ -83,6 +86,12 @@ int main(int argc, char *argv[])
   float n = stoi(argv[4]);
   float intensity = stoi(argv[5]);
   int nbthreads = stoi(argv[6]);
+  // int functionid = 1;
+  // float a = 0;
+  // float b = 10;
+  // float n = 1000;
+  // float intensity = 1;
+  // int nbthreads = 2;
   float summation;
   auto before_integration = chrono::system_clock::now();
   switch (functionid)
