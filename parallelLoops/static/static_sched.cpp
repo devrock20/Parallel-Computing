@@ -52,8 +52,11 @@ float getSummation(absFun function, float a, float b, float n, float intensity, 
       0, nbthreads, 1,
       [&](int i) -> void {
         filethreads.push_back(thread(single_thread_action, i, n, nbthreads, a, b, function, intensity, ref(sum)));
-        filethreads.at(i).join();
+//         filethreads.at(i).join();
       });
+  for(auto &it: filethreads) {
+    it.join();
+  }
   return sum;
 }
 
