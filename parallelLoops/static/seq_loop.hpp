@@ -6,13 +6,6 @@
 #include <thread>
 
 using namespace std;
-struct my_collection
-{
-  float a, b;
-  int n, end, start, functionid, intensity;
-
-  float sum;
-};
 
 class SeqLoop
 {
@@ -26,7 +19,6 @@ public:
   void parfor1(size_t beg, size_t end, size_t inc,
                std::function<void(int)> f)
   {
-
     for (size_t i = beg; i < end; i += inc)
     {
       f(i);
@@ -55,34 +47,14 @@ public:
               std::function<void(int, TLS &)> func,
               std::function<void(TLS &)> after)
   {
-    TLS tls;
     vector<thread> thread_stack;
     vector<TLS> localSum(nthreads);
-    int flag = true;
     for (int t = 0; t < nthreads; t += 1)
     {
       before(localSum[t]);
-      // localSum[t] = 0.0;
-      // for(int j=t;j<end;j+=nthreads) {
-      //   func(j, localSum[t]);
-      //   // cout<< localSum[t] <<endl;
-      // }
-      // parfor1(t, end, nthreads, [&](int j) -> void {
-      //       /**
-      //        * problem here is localSum when refernce outside this lambda function is giving empty array
-      //       */
-      //       func(j, localSum[t]);
-      //       // cout << localSum[t] << endl; //this gets printed correctly
-      //     });
-
-      auto healperFn = [&,t](int j) -> void {
-        /**
-             * problem here is localSum when refernce outside this lambda function is giving empty array
-            */
+      thread_stack.push_back(thread(&SeqLoop::parfor1, this, t, end, nthreads, [&, t](int j) -> void {
         func(j, localSum[t]);
-        // cout << localSum[t] << " t: " << t << endl; //this gets printed correctly
-      };
-      thread_stack.push_back(thread(&SeqLoop::parfor1, this, t, end, nthreads, healperFn));
+      }));
     }
     for (auto &itr : thread_stack)
     {
@@ -90,9 +62,7 @@ public:
     }
     for (auto &itr : localSum)
     {
-      // cout << itr << endl; // when accessing same array outside the lambda, I am getting 0
       after(itr);
-      // tls += itr;
     }
   }
 };
