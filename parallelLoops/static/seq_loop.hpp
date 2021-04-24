@@ -57,13 +57,8 @@ public:
   {
     TLS tls;
     vector<thread> thread_stack;
-    // float localSum[nthreads];
     vector<TLS> localSum(nthreads);
     int flag = true;
-    //0 2 4 6 8
-    //1 3 5 7 9
-    // beg= 0
-    // nthreads = 2
     for (int t = 0; t < nthreads; t += 1)
     {
       before(localSum[t]);
@@ -80,12 +75,12 @@ public:
       //       // cout << localSum[t] << endl; //this gets printed correctly
       //     });
 
-      auto healperFn = [&](int j) -> void {
+      auto healperFn = [&,t](int j) -> void {
         /**
              * problem here is localSum when refernce outside this lambda function is giving empty array
             */
         func(j, localSum[t]);
-        cout << localSum[t] << " t: " << t << endl; //this gets printed correctly
+        // cout << localSum[t] << " t: " << t << endl; //this gets printed correctly
       };
       thread_stack.push_back(thread(&SeqLoop::parfor1, this, t, end, nthreads, healperFn));
     }
@@ -95,7 +90,7 @@ public:
     }
     for (auto &itr : localSum)
     {
-      cout << itr << endl; // when accessing same array outside the lambda, I am getting 0
+      // cout << itr << endl; // when accessing same array outside the lambda, I am getting 0
       after(itr);
       // tls += itr;
     }
