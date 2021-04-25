@@ -74,11 +74,11 @@ int main (int argc, char* argv[]) {
     s += no_of_iterations;
   }
   d.done();
-  for (auto &itr : thread_stack)
+  for (auto &itr : thread_pool)
     {
       itr.join();
     }
-    
+
   std::cout << ((b - a) / n) * sum << endl;
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();

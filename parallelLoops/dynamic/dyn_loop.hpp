@@ -5,6 +5,7 @@
 #include <vector>
 #include <thread>
 #include <mutex>
+#include <queue>
 #include <condition_variable>
 
 using namespace std;
@@ -17,30 +18,31 @@ class DynLoop
   condition_variable_any cond;
 
   void push(function<void()> f){
-      mut.lock;
+      mut.lock();
       function_queue.push(f);
-      mut.unlock;
+      mut.unlock();
       cond.notify_one();
   }
   void initial_run(){
-      function<void()> f
+      function<void()> f;
       while (true){
-          mut.lock;
+          mut.lock();
           cond.wait(mut,[this] (){return done || !function_queue.empty();});
           if (!function_queue.empty()){
               f = function_queue.front();
               function_queue.pop()
           }
-          mut.unlock
+          mut.unlock();
           f();
 
       }
   }
   void done(){
-      mut.lock;
-      mut.unlock;
-      cond.notify_all;
+      mut.lock();
+      mut.unlock();
+      cond.notify_all();
   }
 
 
 }
+#endif
