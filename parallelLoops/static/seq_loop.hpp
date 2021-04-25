@@ -48,19 +48,19 @@ public:
               std::function<void(TLS &)> after)
   {
     vector<thread> thread_stack;
-    vector<TLS> localSum(nthreads);
+    vector<TLS> threadContextStorage(nthreads);
     for (int t = 0; t < nthreads; t += 1)
     {
-      before(localSum[t]);
+      before(threadContextStorage[t]);
       thread_stack.push_back(thread(&SeqLoop::parfor1, this, t, end, nthreads, [&, t](int j) -> void {
-        func(j, localSum[t]);
+        func(j, threadContextStorage[t]);
       }));
     }
     for (auto &itr : thread_stack)
     {
       itr.join();
     }
-    for (auto &itr : localSum)
+    for (auto &itr : threadContextStorage)
     {
       after(itr);
     }
