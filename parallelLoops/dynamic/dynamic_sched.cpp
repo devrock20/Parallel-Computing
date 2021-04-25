@@ -43,11 +43,12 @@ int main (int argc, char* argv[]) {
   DynLoop d;
   vector<thread> thread_pool;
   for (int i =0;i<nbthreads;i++){
-    thread_pool.push_back(thread(&DynLoop::initial_run, &d);
+    thread_pool.push_back(thread(&DynLoop::initial_run, &d));
   }
 
   void numerical_intergration_funnction(int functionid,float a,float b,
-                                        float n,float intensity,float sum){
+                                        float n,float intensity,float sum)
+    {
     float tls = 0.0;                                      
     float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
