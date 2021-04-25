@@ -21,7 +21,28 @@ extern "C"
 }
 #endif
 
-
+void numerical_function(int functionid,float a, float b,float n,float intensity,
+                        int nbthreads){
+      int  i = 0;                  
+     float x = (a + (i + 0.5) * ((b - a) / n));
+        switch (functionid)
+        {
+        case 1:
+          tls += f1(x, intensity);
+          break;
+        case 2:
+          tls += f2(x, intensity);
+          break;
+        case 3:
+          tls += f3(x, intensity);
+          break;
+        case 4:
+          tls += f4(x, intensity);
+          break;
+        }
+        sum += tls;
+    return sum
+}
 
 int main (int argc, char* argv[]) {
 
@@ -48,30 +69,9 @@ int main (int argc, char* argv[]) {
     thread_pool.push_back(thread(&DynLoop::initial_run, &d));
   }
 
-  for (int s = 0;s<n;s += no_of_iterations;){
+  for (int s = 0;s<n;s += no_of_iterations){
     d.push(
-      [&](int i, float &tls) -> void {
-        float tls =0.0;
-        float x = (a + (i + 0.5) * ((b - a) / n));
-        switch (functionid)
-        {
-        case 1:
-          tls += f1(x, intensity);
-          break;
-        case 2:
-          tls += f2(x, intensity);
-          break;
-        case 3:
-          tls += f3(x, intensity);
-          break;ß
-        case 4:
-          tls += f4(x, intensity);
-          break;
-        }
-        sum += tls;
-      }
-    );
-    
+      numerical_function(functionid,a,b,s,intensity));
   }
   d.is_done();
   for (auto &itr : thread_pool)

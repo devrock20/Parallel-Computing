@@ -18,7 +18,7 @@ class DynLoop
   condition_variable_any cond;
   bool done = false;
 
-  void push(std::function<void(int, TLS &)> f){
+  void push(std::function<void()> f){
       mut.lock();
       function_queue.push(f);
       mut.unlock();
