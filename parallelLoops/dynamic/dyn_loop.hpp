@@ -13,7 +13,7 @@ using namespace std;
 class DynLoop
 {
   public:
-  queue<function<void()>> function_queue;
+  queue<function<float(int functionid,float a, float b,float n,float intensity)>> function_queue;
   mutex mut;
   condition_variable_any cond;
   bool done = false;
