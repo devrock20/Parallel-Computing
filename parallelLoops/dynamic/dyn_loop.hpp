@@ -33,7 +33,7 @@ public:
   }
 
   void inital_run(){
-      std::function<void(int)> f
+      std::function<void(int)> f;
       while (true){
           mut.lock();
           cond.wait(mut,[this] (){return (done) || !function_queue.empty();});
@@ -90,9 +90,9 @@ public:
     for (int t = 0; t < nthreads; t += 1)
     {
       before(threadContextStorage[t]);
-      thread_stack.push_back(thread(&DynLoop::inital_run,this);
+      thread_stack.push_back(thread(&DynLoop::inital_run,this));
       push(&SeqLoop::parfor1, this, t, end,no_of_iterations, [&, t](int j) -> void {
-        func(j, threadContextStorage[t])
+        func(j, threadContextStorage[t]);
       }));
     }
     is_done();

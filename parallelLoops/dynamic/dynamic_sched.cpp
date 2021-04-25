@@ -36,7 +36,6 @@ int main (int argc, char* argv[]) {
   float intensity = stoi(argv[5]);
   int nbthreads = stoi(argv[6]);
   int granularity = stoi(argv[7]);
-  int no_of_iterations = n/granularity;
   int common_expression = ((b - a) / n);
   float sum = 0.0;
   std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
@@ -44,7 +43,7 @@ int main (int argc, char* argv[]) {
   DynLoop d1;
 
   d1.parfor<float>(
-      0, n, 1, nbthreads,
+      0, n, 1, nbthreads,granularity,
       [&](float &tls) -> void {
         tls = 0.0;
       },
