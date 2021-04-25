@@ -38,7 +38,7 @@ class DynLoop
 
       }
   }
-  void done(){
+  void is_done(){
       mut.lock();
       done = true;
       mut.unlock();

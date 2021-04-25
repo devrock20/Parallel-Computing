@@ -73,7 +73,7 @@ int main (int argc, char* argv[]) {
     );
     s += no_of_iterations;
   }
-  d.done();
+  d.is_done();
   for (auto &itr : thread_pool)
     {
       itr.join();
