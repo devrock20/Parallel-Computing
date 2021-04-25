@@ -23,29 +23,6 @@ float f4(float x, int intensity);
 #endif
 
 
-void numerical_intergration_funnction(int functionid,float a,float b,
-                                        float n,float intensity,float sum){
-    float tls = 0.0;                                      
-    float x = (a + (i + 0.5) * ((b - a) / n));
-        switch (functionid)
-        {
-        case 1:
-          tls += f1(x, intensity);
-          break;
-        case 2:
-          tls += f2(x, intensity);
-          break;
-        case 3:
-          tls += f3(x, intensity);
-          break;
-        case 4:
-          tls += f4(x, intensity);
-          break;
-        }
-    sum += tls;
-    return sum;
-  }
-
 int main (int argc, char* argv[]) {
 
   if (argc < 8) {
@@ -91,6 +68,7 @@ int main (int argc, char* argv[]) {
           break;
         }
         sum += tls;
+      }
     );
     s += no_of_iterations;
   }
