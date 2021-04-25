@@ -21,9 +21,10 @@ extern "C"
 }
 #endif
 
-void numerical_function(int functionid,float a, float b,float n,float intensity,
-                        int nbthreads){
-      int  i = 0;                  
+void numerical_function(int functionid,float a, float b,float n,float intensity){
+     int  i = 0;
+     float tls = 0.0;
+     float sum = 0;                  
      float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
         {
@@ -41,7 +42,7 @@ void numerical_function(int functionid,float a, float b,float n,float intensity,
           break;
         }
         sum += tls;
-    return sum
+    return sum;
 }
 
 int main (int argc, char* argv[]) {
