@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "dyn_loop.hpp"
-#include "<vector>"
 using namespace std;
 
 #ifdef __cplusplus
@@ -49,10 +48,10 @@ int main (int argc, char* argv[]) {
     thread_pool.push_back(thread(&DynLoop::initial_run, &d));
   }
 
-  for (int s = 0;s<n;){
+  for (int s = 0;s<n;s += no_of_iterations;){
     d.push(
       [&](int i, float &tls) -> void {
-        tls =0.0
+        float tls =0.0;
         float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
         {
@@ -72,7 +71,7 @@ int main (int argc, char* argv[]) {
         sum += tls;
       }
     );
-    s += no_of_iterations;
+    
   }
   d.is_done();
   for (auto &itr : thread_pool)
