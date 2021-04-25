@@ -27,10 +27,10 @@ class DynLoop
       function<void()> f;
       while (true){
           mut.lock();
-          cond.wait(mut,[this] (){return done || !function_queue.empty();});
+          cond.wait(mut,[this] (){return (done) || !function_queue.empty();});
           if (!function_queue.empty()){
               f = function_queue.front();
-              function_queue.pop()
+              function_queue.pop();
           }
           mut.unlock();
           f();
