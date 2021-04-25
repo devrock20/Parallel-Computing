@@ -1,12 +1,10 @@
-
 #include <iostream>
+#include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <chrono>
-#include <cmath>
-#include "seq_loop.hpp"
-#include "vector"
+
+#include "dyn_loop.hpp"
 using namespace std;
 
 #ifdef __cplusplus
@@ -23,34 +21,11 @@ extern "C"
 }
 #endif
 
-int main(int argc, char *argv[])
-{
-
-  if (argc < 7)
-  {
-    std::cerr << "usage: " << argv[0] << " <functionid> <a> <b> <n> <intensity> <nbthreads>" << std::endl;
-    return -1;
-  }
-  int functionid = stoi(argv[1]);
-  float a = stoi(argv[2]);
-  float b = stoi(argv[3]);
-  float n = stoi(argv[4]);
-  float intensity = stoi(argv[5]);
-  int nbthreads = stoi(argv[6]);
-  int granularity = stoi(argv[7]);
-  int common_expression = ((b - a) / n);
-  float sum = 0.0;
-  std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
-
-  SeqLoop s1;
-
-  s1.parfor<float>(
-      0, n, 1, nbthreads, granularity,
-      [&](float &tls) -> void {
-        tls = 0.0;
-      },
-      [&](int i, float &tls) -> void {
-        float x = (a + (i + 0.5) * ((b - a) / n));
+float numerical_function(int functionid,float a, float b,float n,float intensity){
+     int  i = 0;
+     float tls = 0.0;
+     float sum = 0;                  
+     float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
         {
         case 1:
@@ -66,10 +41,44 @@ int main(int argc, char *argv[])
           tls += f4(x, intensity);
           break;
         }
-      },
-      [&](float &tls) -> void {
         sum += tls;
-      });
+    return sum;
+}
+
+int main (int argc, char* argv[]) {
+
+  if (argc < 8) {
+    std::cerr<<"usage: "<<argv[0]<<" <functionid> <a> <b> <n> <intensity> <nbthreads> <granularity>"<<std::endl;
+    return -1;
+  }
+
+  int functionid = stoi(argv[1]);
+  float a = stoi(argv[2]);
+  float b = stoi(argv[3]);
+  float n = stoi(argv[4]);
+  float intensity = stoi(argv[5]);
+  int nbthreads = stoi(argv[6]);
+  int granularity = stoi(argv[7]);
+  int no_of_iterations = n/granularity;
+  int common_expression = ((b - a) / n);
+  float sum = 0.0;
+  std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
+
+  DynLoop d;
+  vector<thread> thread_pool;
+  for (int i =0;i<nbthreads;i++){
+    thread_pool.push_back(thread(&DynLoop::initial_run, &d));
+  }
+
+  for (int s = 0;s<n;s += no_of_iterations){
+    d.push(
+      numerical_function(functionid,a,b,s,intensity));
+  }
+  d.is_done();
+  for (auto &itr : thread_pool)
+    {
+      itr.join();
+    }
 
   std::cout << ((b - a) / n) * sum << endl;
 
