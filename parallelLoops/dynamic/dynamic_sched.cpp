@@ -41,16 +41,14 @@ int main (int argc, char* argv[]) {
   float sum = 0.0;
   std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
 
-  DynLoop d;
-  vector<thread> thread_pool;
-  for (int i =0;i<nbthreads;i++){
-    thread_pool.push_back(thread(&DynLoop::initial_run, &d));
-  }
+  DynLoop d1;
 
-  for (int s = 0;s<n;s += no_of_iterations){
-    d.push(
-      [&](int i, float &tls) -> void {
+  d1.parfor<float>(
+      0, n, 1, nbthreads,
+      [&](float &tls) -> void {
         tls = 0.0;
+      },
+      [&](int i, float &tls) -> void {
         float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
         {
@@ -67,15 +65,10 @@ int main (int argc, char* argv[]) {
           tls += f4(x, intensity);
           break;
         }
-        sum += tls;
       },
-      );
-  }
-  d.is_done();
-  for (auto &itr : thread_pool)
-    {
-      itr.join();
-    }
+      [&](float &tls) -> void {
+        sum += tls;
+      });
 
   std::cout << ((b - a) / n) * sum << endl;
 
