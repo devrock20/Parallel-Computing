@@ -4,6 +4,7 @@
 #include <functional>
 #include <queue>
 #include <mutex>
+#include <thread>
 #include <condition_variable>
 
 using namespace std;
@@ -43,7 +44,7 @@ public:
   /// Once the iterations are complete, each thread will execute after
   /// on the TLS object. No two thread can execute after at the same time.
   template <typename TLS>
-  void parfor(size_t beg, size_t end, size_t increment, size_t nthreads,size_t granularity std::function<void(TLS &)> before,
+  void parfor(size_t beg, size_t end, size_t increment, size_t nthreads,size_t granularity,std::function<void(TLS &)> before,
               std::function<void(int, TLS &)> func,
               std::function<void(TLS &)> after)
   {
