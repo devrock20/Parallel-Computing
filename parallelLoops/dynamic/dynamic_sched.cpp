@@ -21,7 +21,7 @@ extern "C"
 }
 #endif
 
-void numerical_function(int functionid,float a, float b,float n,float intensity){
+float numerical_function(int functionid,float a, float b,float n,float intensity){
      int  i = 0;
      float tls = 0.0;
      float sum = 0;                  

@@ -18,7 +18,7 @@ class DynLoop
   condition_variable_any cond;
   bool done = false;
 
-  void push(std::function<void()> f){
+  void push(std::function<float()> f){
       mut.lock();
       function_queue.push(f);
       mut.unlock();
@@ -46,5 +46,5 @@ class DynLoop
   }
 
 
-}
+};
 #endif
