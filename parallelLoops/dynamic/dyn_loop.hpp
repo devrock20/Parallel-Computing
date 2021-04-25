@@ -53,7 +53,7 @@ public:
     for (int t = 0; t < nthreads; t += 1)
     {
       before(threadContextStorage[t]);
-      thread_stack.push_back(thread(&SeqLoop::parfor1, this, t, number_of_iterations, nthreads, [&, t](int j) -> void {
+      thread_stack.push_back(thread(&DynLoop::parfor1, this, t, number_of_iterations, nthreads, [&, t](int j) -> void {
         func(j, threadContextStorage[t]);
       }));
     }

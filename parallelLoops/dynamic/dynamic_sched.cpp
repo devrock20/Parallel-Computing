@@ -39,9 +39,6 @@ int main (int argc, char* argv[]) {
   float sum = 0.0;
   std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
 
-  float sum = 0.0;
-  std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
-
   DynLoop s1;
 
   s1.parfor<float>(
