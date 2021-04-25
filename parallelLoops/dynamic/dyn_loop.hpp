@@ -13,7 +13,7 @@ using namespace std;
 class DynLoop
 {
 public:
-  queue<function<void(int)>> function_queue;
+  queue<function<void(int,int,int,std::function<void(int)>)>> function_queue;
   mutex mut;
   condition_variable_any cond;
   bool done = false;
@@ -33,7 +33,7 @@ public:
   }
 
   void inital_run(){
-      std::function<void(int)> f;
+      std::function<void(int,int,int,std::function<void(int)>)> f;
       while (true){
           mut.lock();
           cond.wait(mut,[this] (){return (done) || !function_queue.empty();});
@@ -45,7 +45,7 @@ public:
       }
   }
 
-  void push(std::function<void(int)> f){
+  void push(std::function<void(int,int,int,std::function<void(int)>)> f){
       mut.lock();
       function_queue.push(f);
       mut.unlock();
@@ -91,10 +91,10 @@ public:
     {
       before(threadContextStorage[t]);
       thread_stack.push_back(thread(&DynLoop::inital_run,this));
-      push(&SeqLoop::parfor1, this, t, end,no_of_iterations, [&, t](int j) -> void {
-        func(j, threadContextStorage[t]);
-      }));
+      push(&DynLoop::parfor1(t,no_of_iterations,1,[&, t](int j) -> void {
+        func(j, threadContextStorage[t]);))
     }
+
     is_done();
     for (auto &itr : thread_stack)
     {
