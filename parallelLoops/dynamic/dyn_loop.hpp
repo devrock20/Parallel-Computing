@@ -16,6 +16,7 @@ class DynLoop
   queue<function<void()>> function_queue;
   mutex mut;
   condition_variable_any cond;
+  bool done = false;
 
   void push(function<void()> f){
       mut.lock();
@@ -39,6 +40,7 @@ class DynLoop
   }
   void done(){
       mut.lock();
+      done = true;
       mut.unlock();
       cond.notify_all();
   }
