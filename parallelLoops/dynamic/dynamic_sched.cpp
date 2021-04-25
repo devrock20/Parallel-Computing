@@ -72,7 +72,26 @@ int main (int argc, char* argv[]) {
   }
 
   for (int s = 0;s<n;){
-    d.push(numerical_intergration_funnction(functionid,a,b,s,intensity,sum));
+    d.push(
+      [&](int i, float &tls) -> void {
+        float x = (a + (i + 0.5) * ((b - a) / n));
+        switch (functionid)
+        {
+        case 1:
+          tls += f1(x, intensity);
+          break;
+        case 2:
+          tls += f2(x, intensity);
+          break;
+        case 3:
+          tls += f3(x, intensity);
+          break;
+        case 4:
+          tls += f4(x, intensity);
+          break;
+        }
+        sum += tls;
+    );
     s += no_of_iterations;
   }
   d.done();
