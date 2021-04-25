@@ -92,8 +92,8 @@ public:
       before(threadContextStorage[t]);
       thread_stack.push_back(thread(&DynLoop::inital_run,this));
       push(&DynLoop::parfor1(t,no_of_iterations,1,[&, t](int j) -> void {
-        func(j, threadContextStorage[t]);))
-    }
+        func(j, threadContextStorage[t]);
+    }));
 
     is_done();
     for (auto &itr : thread_stack)
@@ -105,6 +105,8 @@ public:
       after(itr);
     }
   }
+ }
 };
+
 
 #endif
