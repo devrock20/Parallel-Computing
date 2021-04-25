@@ -5,8 +5,8 @@
 #include <string.h>
 
 #include "dyn_loop.hpp"
-#include "vector"
-
+#include "<vector>"
+using namespace std;
 
 #ifdef __cplusplus
 extern "C"
@@ -52,6 +52,7 @@ int main (int argc, char* argv[]) {
   for (int s = 0;s<n;){
     d.push(
       [&](int i, float &tls) -> void {
+        tls =0.0
         float x = (a + (i + 0.5) * ((b - a) / n));
         switch (functionid)
         {
@@ -63,7 +64,7 @@ int main (int argc, char* argv[]) {
           break;
         case 3:
           tls += f3(x, intensity);
-          break;
+          break;ß
         case 4:
           tls += f4(x, intensity);
           break;
