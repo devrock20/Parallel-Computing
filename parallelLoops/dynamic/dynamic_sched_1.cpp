@@ -63,6 +63,15 @@ int main (int argc, char* argv[]) {
         }
       }));
   }
+  for (int i=0;i<n;i+=chunk_size){
+      beg = i;
+      end = i+(chunk_size-1)
+      d1.push(beg,end)
+  }
+  d1.is_done()
+  for (auto &itr:thread_stack ){
+      thread_stack.join()
+  }
 
   std::cout << ((b - a) / n) * sum << endl;
 
