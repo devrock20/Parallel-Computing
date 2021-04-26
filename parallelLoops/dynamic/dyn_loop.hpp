@@ -13,7 +13,7 @@ using namespace std;
 class DynLoop
 {
 public:
-  queue<function<void(int,int,int,std::function<void(int)>)>> function_queue;
+  queue<function<void(int,float ,float ,float ,float ,float)>> function_queue;
   mutex mut;
   condition_variable_any cond;
   bool done = false;
@@ -23,7 +23,7 @@ public:
   /// f will be executed multiple times with parameters starting at
   /// beg, no greater than end, in inc increment. These execution may
   /// be in parallel
-  void parfor1(size_t beg, size_t end, size_t inc,
+  /*void parfor1(size_t beg, size_t end, size_t inc,
                std::function<void(int)> f)
   {
     for (size_t i = beg; i < end; i += inc)
@@ -31,9 +31,9 @@ public:
       f(i);
     }
   }
-
+ */
   void inital_run(){
-      std::function<void(int,int,int,std::function<void(int)>)> f;
+      std::function<void(int ,float ,float ,float ,float ,float)> f;
       while (true){
           mut.lock();
           cond.wait(mut,[this] (){return (done) || !function_queue.empty();});
@@ -43,9 +43,10 @@ public:
           }
           mut.unlock();
       }
+      f();
   }
 
-  void push(std::function<void(int,int,int,std::function<void(int)>)> f){
+  void push(std::function<void(int ,float ,float ,float ,float ,float)> f){
       mut.lock();
       function_queue.push(f);
       mut.unlock();
@@ -77,7 +78,7 @@ public:
   ///
   /// Once the iterations are complete, each thread will execute after
   /// on the TLS object. No two thread can execute after at the same time.
-  template <typename TLS>
+/*template <typename TLS>
   void parfor(size_t beg, size_t end, size_t increment, size_t nthreads,
                 size_t granularity,
                  std::function<void(TLS &)> before,
@@ -107,6 +108,8 @@ public:
   }
  }
 };
+*/
+
 
 
 #endif
