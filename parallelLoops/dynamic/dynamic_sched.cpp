@@ -22,7 +22,10 @@ extern "C"
 }
 #endif
 
-void num_intergation(int functionid,float a,float b,float i,float n,float intensity){
+float sum=0.0;
+
+void num_intergation(int functionid,float a,float b,float i,float n,float intensity,float &){
+  mut.lock();
   float tls = 0.0;
   float x = (a + (i + 0.5) * ((b - a) / n));
   switch (functionid)
@@ -41,6 +44,7 @@ void num_intergation(int functionid,float a,float b,float i,float n,float intens
           break;
         }
   sum += tls;
+  mut.unlock();
 }
 
 
@@ -95,17 +99,34 @@ int main (int argc, char* argv[]) {
   */
   vector<thread> thread_pool;
   for (int t = 0; t < nthreads; t += 1){
-    thread_stack.push_back(thread(&DynLoop::inital_run,&d1)
+    thread_stack.push_back(thread(&SeqLoop::parfor1,0,n,chunk_size,
+    [&](float &tls) -> void {
+        tls = 0.0;
+      },
+      [&](int i, float &tls) -> void {
+        float x = (a + (i + 0.5) * ((b - a) / n));
+        switch (functionid)
+        {
+        case 1:
+          tls += f1(x, intensity);
+          break;
+        case 2:
+          tls += f2(x, intensity);
+          break;
+        case 3:
+          tls += f3(x, intensity);
+          break;
+        case 4:
+          tls += f4(x, intensity);
+          break;
+        }
+      },
+      [&](float &tls) -> void {
+        sum += tls;
+      });
+    )
   }
-  for (int s =0;s<n;s+=chunk_size){
-    d1.push(num_intergation(functionid,a,b,s,n,intensity))
-  }
-  d1.is_done();
-  for (auto &itr : thread_stack)
-    {
-      itr.join();
-    }
-
+  
   std::cout << ((b - a) / n) * sum << endl;
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
