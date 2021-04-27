@@ -40,7 +40,7 @@ void parfor(size_t beg, size_t end, size_t increment, size_t nthreads,
 
   //create thread pool
   vector<thread> thread_stack;
-  // bool sorted = false
+  bool sorted = false;
   //start executor parallely
   for (int t = 0; t < nthreads; t += 1)
   {
@@ -64,6 +64,57 @@ void parfor(size_t beg, size_t end, size_t increment, size_t nthreads,
   for (auto &itr : thread_stack)
   {
     itr.join();
+  }
+}
+void simpleFor(size_t beg, size_t end, size_t inc,
+               std::function<void(int)> f)
+{
+  for (size_t i = beg; i < end; i += inc)
+  {
+    f(i);
+  }
+}
+
+void staticFor(size_t beg, size_t end, size_t inc, size_t nthreads,
+               std::function<void(int)> func)
+{
+  vector<thread> thread_stack;
+  int chuck = (end - beg) / nthreads;
+  // cout<< "chuck: " << chuck << endl;
+  int start = beg;
+  for (int t = 1; t <= nthreads; t++)
+  {
+    // cout << "Starting a thread with: beg: " << start << "| end: " << end << " | inc: " << inc * nthreads << endl;
+    thread_stack.push_back(thread(simpleFor, start, end, inc * nthreads, func));
+    start += inc;
+  }
+  for (auto &itr : thread_stack)
+  {
+    itr.join();
+  }
+}
+
+template <typename TLS>
+void parfor(size_t beg, size_t end, size_t increment, size_t nthreads, std::function<void(TLS &)> before,
+            std::function<void(int, TLS &)> func,
+            std::function<void(TLS &)> after)
+{
+  vector<thread> thread_stack;
+  vector<TLS> threadContextStorage(nthreads);
+  for (int t = 0; t < nthreads; t += 1)
+  {
+    before(threadContextStorage[t]);
+    thread_stack.push_back(thread(simpleFor, t, end, nthreads, [&, t](int j) -> void {
+      func(j, threadContextStorage[t]);
+    }));
+  }
+  for (auto &itr : thread_stack)
+  {
+    itr.join();
+  }
+  for (auto &itr : threadContextStorage)
+  {
+    after(itr);
   }
 }
 

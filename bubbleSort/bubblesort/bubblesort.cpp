@@ -50,13 +50,12 @@ int main(int argc, char *argv[])
   int *arr = new int[n];
   generateMergeSortData(arr, n);
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-
+  // printArr(arr, n);
   bool swapped = true;
   while (swapped)
   {
     swapped = false;
-    //odd index sorting
-    parfor(
+    staticFor(
         1, n - 1, 2, nthreads,
         [&](int i) -> void {
           if (arr[i] > arr[i + 1])
@@ -65,9 +64,7 @@ int main(int argc, char *argv[])
             swapped = true;
           }
         });
-
-    //even index sorting
-    parfor(
+    staticFor(
         0, n - 1, 2, nthreads,
         [&](int i) -> void {
           if (arr[i] > arr[i + 1])
