@@ -5,57 +5,82 @@
 #include <iostream>
 #include <unistd.h>
 #include <chrono>
+#include "cmath"
+#include "par_loop.hpp"
 
+using namespace std;
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-  void generateMergeSortData (int* arr, size_t n);
-  void checkMergeSortResult (const int* arr, size_t n);
+  void generateMergeSortData(int *arr, size_t n);
+  void checkMergeSortResult(const int *arr, size_t n);
 
 #ifdef __cplusplus
 }
 #endif
 
-void swap(int* arr, int i, int j) {
+void swap(int *arr, int i, int j)
+{
   int temp = arr[i];
   arr[i] = arr[j];
   arr[j] = temp;
 }
 
-int main (int argc, char* argv[]) {
-  
-  if (argc < 2) { std::cerr<<"usage: "<<argv[0]<<" <n>"<<std::endl;
+void printArr(int *arr, int n)
+{
+  for (int i = 0; i < n; i++)
+  {
+    cout << arr[i] << "\t";
+  }
+  cout << endl;
+}
+int main(int argc, char *argv[])
+{
+  if (argc < 3)
+  {
+    std::cerr << "usage: " << argv[0] << " <n> <nbthreads>" << std::endl;
     return -1;
   }
 
   int n = atoi(argv[1]);
-  
+  int nthreads = atoi(argv[2]);
   // get arr data
-  int * arr = new int [n];
+  int *arr = new int[n];
   generateMergeSortData(arr, n);
-
-
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-
-  int swapped = 1;
-  while (swapped) {
-    swapped = 0;
-    for (int i=0; i<n; ++i) {
-      if (arr[i-1] > arr[i]) {
-        swap(arr, i-1, i);
-        swapped = 1;
-      }
-    }
-    n--;
+  // printArr(arr, n);
+  bool swapped = true;
+  while (swapped)
+  {
+    swapped = false;
+    staticFor(
+        1, n - 1, 2, nthreads,
+        [&](int i) -> void {
+          if (arr[i] > arr[i + 1])
+          {
+            swap(arr, i, i + 1);
+            swapped = true;
+          }
+        });
+    staticFor(
+        0, n - 1, 2, nthreads,
+        [&](int i) -> void {
+          if (arr[i] > arr[i + 1])
+          {
+            swap(arr, i, i + 1);
+            swapped = true;
+          }
+        });
   }
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elpased_seconds = end-start;
-  
-  checkMergeSortResult (arr, n);
-  std::cerr<<elpased_seconds.count()<<std::endl;
-  
+  std::chrono::duration<double> elpased_seconds = end - start;
+
+  checkMergeSortResult(arr, n);
+  std::cerr << elpased_seconds.count() << std::endl;
+
   delete[] arr;
 
   return 0;
