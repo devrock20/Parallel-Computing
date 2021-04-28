@@ -71,6 +71,7 @@ void simpleFor(size_t beg, size_t end, size_t inc,
 {
   for (size_t i = beg; i < end; i += inc)
   {
+  // cout << "Beg: " << beg << " end: " << end << " | " << i << endl;
     f(i);
   }
 }
@@ -85,8 +86,10 @@ void staticFor(size_t beg, size_t end, size_t inc, size_t nthreads,
   }
   for (auto &itr : thread_stack)
   {
+    // cout << "Joining: " << itr.get_id();
     itr.join();
   }
+  // cout <<"Joined all" << endl;
 }
 
 template <typename TLS>

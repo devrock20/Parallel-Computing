@@ -58,25 +58,20 @@ int main(int argc, char *argv[])
     multilevelArr[0][i] = arr[i];
   }
 
-  staticFor(1, levels, 1, nthreads, [&](int level) -> void {
+  for (int level = 1; level <= levels; level++)
+  {
     for (int i = 0; i < n; i++)
     {
       multilevelArr[level][i] = multilevelArr[level - 1][i];
     }
-
-    for (int k = pow(2, level - 1); k < n; k++)
-    {
+    staticFor(pow(2, level - 1), n, 1, nthreads, [&](int k) -> void {
       if (k >= pow(2, level - 1))
       {
         int index = k - pow(2, level - 1);
         multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
       }
-    }
-    // if I print something in this lambda function then the last itertaion is stored inside the array
-    // cout<< "Level" << level <<endl;
-  });
-  
-  printArr(multilevelArr, levels, n);
+    });
+  }
 
   /**
    * please ignore below
@@ -101,7 +96,7 @@ int main(int argc, char *argv[])
   pr[0] = 0;
   for (int i = 0; i < n; i++)
   {
-    pr[i + 1] = multilevelArr[levels - 1][i];
+    pr[i + 1] = multilevelArr[levels][i];
   }
   chrono::time_point<chrono::system_clock> end = chrono::system_clock::now();
 
