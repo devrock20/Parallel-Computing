@@ -75,16 +75,19 @@ class DynLoop
     vector<thread> thread_stack;
     vector<TLS> threadContextStorage(nthreads);
     int counter = 0;
-    for (int t = 0; t < nthreads; t += 1)
-    {
+    for (int t  = 0;t< nthreads;t+=1){
       before(threadContextStorage[t]);
-      thread_stack.push_back(thread(&DynLoop::executor, this, chunk_size,[&, t](int j) -> void {
-        func(j, threadContextStorage[t]);
-      }));
     }
     for (int i = beg; i < end; i +=  chunk_size)
     {
         this->push_items(i);
+    }  
+    for (int t = 0; t < nthreads; t += 1)
+    {
+      //before(threadContextStorage[t]);
+      thread_stack.push_back(thread(&DynLoop::executor, this, chunk_size,[&, t](int j) -> void {
+        func(j, threadContextStorage[t]);
+      }));
     }
     this->all_done();
     
