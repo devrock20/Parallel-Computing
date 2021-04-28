@@ -1,11 +1,12 @@
+
 #include <iostream>
-#include <chrono>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <chrono>
+#include <cmath>
 #include "dyn_loop.hpp"
-
+#include "vector"
 using namespace std;
 
 #ifdef __cplusplus
@@ -22,39 +23,14 @@ extern "C"
 }
 #endif
 
-float sum=0.0;
+int main(int argc, char *argv[])
+{
 
-void num_intergation(int functionid,float a,float b,float i,float n,float intensity,float &){
-  mut.lock();
-  float tls = 0.0;
-  float x = (a + (i + 0.5) * ((b - a) / n));
-  switch (functionid)
-      {
-        case 1:
-          tls += f1(x, intensity);
-          break;
-        case 2:
-          tls += f2(x, intensity);
-          break;
-        case 3:
-          tls += f3(x, intensity);
-          break;
-        case 4:
-          tls += f4(x, intensity);
-          break;
-        }
-  sum += tls;
-  mut.unlock();
-}
-
-
-int main (int argc, char* argv[]) {
-
-  if (argc < 8) {
-    std::cerr<<"usage: "<<argv[0]<<" <functionid> <a> <b> <n> <intensity> <nbthreads> <granularity>"<<std::endl;
+  if (argc < 7)
+  {
+    std::cerr << "usage: " << argv[0] << " <functionid> <a> <b> <n> <intensity> <nbthreads> <granularity>" << std::endl;
     return -1;
   }
-
   int functionid = stoi(argv[1]);
   float a = stoi(argv[2]);
   float b = stoi(argv[3]);
@@ -65,13 +41,12 @@ int main (int argc, char* argv[]) {
   int chunk_size = n/granularity;
   int common_expression = ((b - a) / n);
   float sum = 0.0;
-  mutex mut;
   std::chrono::time_point<std::chrono::system_clock> begin = std::chrono::system_clock::now();
 
   DynLoop d1;
 
-  /* d1.parfor<float>(
-      0, n, 1, nbthreads,granularity,
+  d1.parfor<float>(
+      0, n, 1, nbthreads,chunk_size,
       [&](float &tls) -> void {
         tls = 0.0;
       },
@@ -96,37 +71,7 @@ int main (int argc, char* argv[]) {
       [&](float &tls) -> void {
         sum += tls;
       });
-  */
-  vector<thread> thread_pool;
-  for (int t = 0; t < nthreads; t += 1){
-    thread_stack.push_back(thread(&SeqLoop::parfor1,0,n,chunk_size,
-    [&](float &tls) -> void {
-        tls = 0.0;
-      },
-      [&](int i, float &tls) -> void {
-        float x = (a + (i + 0.5) * ((b - a) / n));
-        switch (functionid)
-        {
-        case 1:
-          tls += f1(x, intensity);
-          break;
-        case 2:
-          tls += f2(x, intensity);
-          break;
-        case 3:
-          tls += f3(x, intensity);
-          break;
-        case 4:
-          tls += f4(x, intensity);
-          break;
-        }
-      },
-      [&](float &tls) -> void {
-        sum += tls;
-      });
-    )
-  }
-  
+
   std::cout << ((b - a) / n) * sum << endl;
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
