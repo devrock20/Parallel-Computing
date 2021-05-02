@@ -59,17 +59,13 @@ void parfor(size_t beg1, size_t beg2,
   //start pushing task to queue
   for (int i = beg1, j = beg2; condt(i, j); i--,j++)
   {
-// cout << i << "|" <<j <<endl;
     {
       lock_guard<mutex> lock(cv_m);
       tasks.push(Task{i, j});
-      // cout<< "Pushed: " << i <<endl;
     }
-    //notify that task is available
     cv.notify_one();
   }
 
-  // all task pushed mark main task as done and wait for threads to complete them
   done = true;
   cv.notify_all();
   for (auto &itr : thread_stack)
@@ -85,47 +81,5 @@ void simpleFor(size_t beg, size_t end, size_t inc,
     f(i);
   }
 }
-
-// void staticFor(size_t beg, size_t end, std::function<bool()> cndt, size_t inc, size_t nthreads,
-//                std::function<void()> func)
-// {
-//   vector<thread> thread_stack;
-//   for (; cndt();)
-//   {
-//     thread_stack.push_back(thread(func));
-//   }
-//   for (int t = 1, start = beg; t <= nthreads; t++, start += inc)
-//   {
-//     thread_stack.push_back(thread(simpleFor, start, end, inc * nthreads, func));
-//   }
-//   for (auto &itr : thread_stack)
-//   {
-//     itr.join();
-//   }
-// }
-
-// template <typename TLS>
-// void parfor(size_t beg, size_t end, size_t increment, size_t nthreads, std::function<void(TLS &)> before,
-//             std::function<void(int, TLS &)> func,
-//             std::function<void(TLS &)> after)
-// {
-//   vector<thread> thread_stack;
-//   vector<TLS> threadContextStorage(nthreads);
-//   for (int t = 0; t < nthreads; t += 1)
-//   {
-//     before(threadContextStorage[t]);
-//     thread_stack.push_back(thread(simpleFor, t, end, nthreads, [&, t](int j) -> void {
-//       func(j, threadContextStorage[t]);
-//     }));
-//   }
-//   for (auto &itr : thread_stack)
-//   {
-//     itr.join();
-//   }
-//   for (auto &itr : threadContextStorage)
-//   {
-//     after(itr);
-//   }
-// }
 
 #endif
