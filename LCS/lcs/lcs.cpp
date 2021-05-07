@@ -58,6 +58,8 @@ int LCS(char *X, int m, char *Y, int n, int nthreads)
       C[i + 1][j + 1] = std::max(C[i][j + 1], C[i + 1][j]);
     }
   };
+  OmpLoop obj;
+  obj.setNbThread(nthreads);
   for (int k = 1; k < m; k++)
   {
     // int i = k, j = 1;
@@ -66,22 +68,28 @@ int LCS(char *X, int m, char *Y, int n, int nthreads)
     //   func(i, j);
     //   i--; });
     // int i = k, j = 1;
-    parfor(
+    obj.parfor(
         k, 1,
         [&](int i, int j) -> bool { return i > 0 && j < n; },
-        [](int i, int j) -> void { i--, j++; },
         [&](int i, int j) -> void {
           func(i, j);
-          //             for (int i = 0; i <= m; i++)
-          // {
-          //   for (int j = 0; j <= n; j++)
-          //   {
-          //     cout << C[i][j] << "\t";
-          //   }
-          //   cout << endl;
-          // }
-        },
-        nthreads);
+        });
+    // parfor(
+    //     k, 1,
+    //     [&](int i, int j) -> bool { return i > 0 && j < n; },
+    //     // [](int i, int j) -> void { i--, j++; },
+    //     [&](int i, int j) -> void {
+    //       func(i, j);
+    //       //             for (int i = 0; i <= m; i++)
+    //       // {
+    //       //   for (int j = 0; j <= n; j++)
+    //       //   {
+    //       //     cout << C[i][j] << "\t";
+    //       //   }
+    //       //   cout << endl;
+    //       // }
+    //     },
+    //     nthreads);
     // for (int i = k, j = 1;i > 0 && j < n; ; i--, j++)
     // {
     //   func(i, j);
@@ -94,29 +102,35 @@ int LCS(char *X, int m, char *Y, int n, int nthreads)
   // cout << "phase 2" << endl;
   for (int c = 1; c < n; c++)
   {
-       parfor(
-        m-1, c,
+    obj.parfor(
+        m - 1, c,
         [&](int i, int j) -> bool { return i > 0 && j < n; },
-        [](int i, int j) -> void { i--, j++; },
         [&](int i, int j) -> void {
           func(i, j);
-        },
-        nthreads);
+        });
+    // parfor(
+    //     m - 1, c,
+    //     [&](int i, int j) -> bool { return i > 0 && j < n; },
+    //     [](int i, int j) -> void { i--, j++; },
+    //     [&](int i, int j) -> void {
+    //       func(i, j);
+    //     },
+    //     nthreads);
     // for (int j = c, i = m - 1; j < n && i > 0; j++, i--)
     // {
-// func(i,j);
-      
-      // if (X[i] == Y[j])
-      // {
-      //   cout << i << "|" << j << " +1" << endl;
+    // func(i,j);
 
-      //   C[i + 1][j + 1] = C[i][j] + 1;
-      // }
-      // else
-      // {
-      //   // cout << i << "|" << j << " max";
-      //   C[i + 1][j + 1] = std::max(C[i][j + 1], C[i + 1][j]);
-      // }
+    // if (X[i] == Y[j])
+    // {
+    //   cout << i << "|" << j << " +1" << endl;
+
+    //   C[i + 1][j + 1] = C[i][j] + 1;
+    // }
+    // else
+    // {
+    //   // cout << i << "|" << j << " max";
+    //   C[i + 1][j + 1] = std::max(C[i][j + 1], C[i + 1][j]);
+    // }
     // }
     // cout << endl;
     // cout << "column number" << c << endl;
