@@ -46,7 +46,8 @@ int main(int argc, char *argv[])
   generatePrefixSumData(arr, n);
   chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
   int *pr = new int[n + 1];
-
+OmpLoop obj;
+obj.setNbThread(nthreads);
   int levels = log2(n) + 1;
 
   int **multilevelArr = new int *[levels + 2];
@@ -60,17 +61,30 @@ int main(int argc, char *argv[])
 
   for (int level = 1; level <= levels; level++)
   {
-    for (int i = 0; i < n; i++)
-    {
+    obj.parfor(0,n,1,[&](int i)->void{
       multilevelArr[level][i] = multilevelArr[level - 1][i];
-    }
-    staticFor(pow(2, level - 1), n, 1, nthreads, [&](int k) -> void {
+    });
+    // staticFor(0,n,1,nthreads,[&](int i)->void{
+    //   multilevelArr[level][i] = multilevelArr[level - 1][i];
+    // });
+    // for (int i = 0; i < n; i++)
+    // {
+    //   multilevelArr[level][i] = multilevelArr[level - 1][i];
+    // }
+    obj.parfor(pow(2, level - 1), n, 1,[&](int k) -> void {
       if (k >= pow(2, level - 1))
       {
         int index = k - pow(2, level - 1);
         multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
       }
     });
+    // staticFor(pow(2, level - 1), n, 1, nthreads, [&](int k) -> void {
+    //   if (k >= pow(2, level - 1))
+    //   {
+    //     int index = k - pow(2, level - 1);
+    //     multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
+    //   }
+    // });
   }
 
   /**

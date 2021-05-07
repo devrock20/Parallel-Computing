@@ -24,7 +24,7 @@ if [ -e ${SUCCESS_FILE} ] ;
 then
     rm ${SUCCESS_FILE} 
 fi
-
+echo $(date)
 for n in 10 11 1000 1111 1000000 1000077;
 do 
     for nbt in 1 2 3 4;
@@ -39,7 +39,7 @@ do
         fi
     done
 done
-
+echo $(date)
 touch ${SUCCESS_FILE} 
 
 
