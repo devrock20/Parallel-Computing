@@ -38,19 +38,18 @@ void printArr(int *arr, int n)
 }
 int main(int argc, char *argv[])
 {
-//   if (argc < 3)
-//   {
-//     std::cerr << "usage: " << argv[0] << " <n> <nbthreads>" << std::endl;
-//     return -1;
-//   }
+  if (argc < 3)
+  {
+    std::cerr << "usage: " << argv[0] << " <n> <nbthreads>" << std::endl;
+    return -1;
+  }
 
-  int n = 10;//atoi(argv[1]);
-  int nthreads = 1;//atoi(argv[2]);
+  int n = atoi(argv[1]);
+  int nthreads = atoi(argv[2]);
   // get arr data
   int *arr = new int[n];
   generateMergeSortData(arr, n);
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-  // printArr(arr, n);
   OmpLoop obj;
   obj.setNbThread(nthreads);
   bool swapped = true;
@@ -72,24 +71,6 @@ int main(int argc, char *argv[])
             swapped = true;
           }
         });
-    // staticFor(
-    //     1, n - 1, 2, nthreads,
-    //     [&](int i) -> void {
-    //       if (arr[i] > arr[i + 1])
-    //       {
-    //         swap(arr, i, i + 1);
-    //         swapped = true;
-    //       }
-    //     });
-    // staticFor(
-    //     0, n - 1, 2, nthreads,
-    //     [&](int i) -> void {
-    //       if (arr[i] > arr[i + 1])
-    //       {
-    //         swap(arr, i, i + 1);
-    //         swapped = true;
-    //       }
-    //     });
   }
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
