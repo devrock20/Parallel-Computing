@@ -51,20 +51,45 @@ int main(int argc, char *argv[])
   generateMergeSortData(arr, n);
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
   // printArr(arr, n);
+  OmpLoop obj;
+  obj.setNbThread(nthreads);
   bool swapped = true;
-  ParallelLoop *p1 = new ParallelLoop(nthreads, [&](int i) -> void {
+  while (swapped)
+  {
+    swapped = false;
+    obj.parfor(1,n-1,2,[&](int i) -> void {
           if (arr[i] > arr[i + 1])
           {
             swap(arr, i, i + 1);
             swapped = true;
           }
         });
-  while (swapped)
-  {
-    swapped = false;
-    // p1.addTask(1, n - 1, 2);
-    p1->addTask(1, n - 1, 2);
-    p1->addTask(0, n - 1, 2);
+
+    obj.parfor(0,n-1,2,[&](int i) -> void {
+          if (arr[i] > arr[i + 1])
+          {
+            swap(arr, i, i + 1);
+            swapped = true;
+          }
+        });
+    // staticFor(
+    //     1, n - 1, 2, nthreads,
+    //     [&](int i) -> void {
+    //       if (arr[i] > arr[i + 1])
+    //       {
+    //         swap(arr, i, i + 1);
+    //         swapped = true;
+    //       }
+    //     });
+    // staticFor(
+    //     0, n - 1, 2, nthreads,
+    //     [&](int i) -> void {
+    //       if (arr[i] > arr[i + 1])
+    //       {
+    //         swap(arr, i, i + 1);
+    //         swapped = true;
+    //       }
+    //     });
   }
 
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
