@@ -63,7 +63,7 @@ void merge(int arr[], int leftIndex, int middleIndex, int rightIndex)
     k++;
   }
 
-  // copy reset
+  // copy rest
   while (i < leftIndex_length)
   {
     arr[leftIndex + k] = leftIndex_array[i];
@@ -95,7 +95,7 @@ void merge_sort(int arr[], int leftIndex, int rightIndex)
 
 // since sections of the array are sorted by threads, now the sorted arrays needs to be sorted
 //starting from 2 sections and all the way to complete sections
-void merge_sections_of_array(int arr[], int nthreads, int aggregation, int thread_section, int n)
+void merge_thread_sections(int arr[], int nthreads, int aggregation, int thread_section, int n)
 {
   for (int i = 0; i < nthreads; i = i + 2)
   {
@@ -117,7 +117,7 @@ void merge_sections_of_array(int arr[], int nthreads, int aggregation, int threa
   if (nthreads / 2 >= 1)
   {
     // if the threads more than 1 that means there are sections of merge that are yet to be merged.
-    merge_sections_of_array(arr, nthreads / 2, aggregation * 2, thread_section, n);
+    merge_thread_sections(arr, nthreads / 2, aggregation * 2, thread_section, n);
   }
 }
 
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 
-  auto thread_merge_sort = [&](int thread_id) -> void {
+  auto thread_level_sort = [&](int thread_id) -> void {
     int leftIndex = thread_id * (thread_section);
     int rightIndex = (thread_id + 1) * (thread_section)-1;
     // adjust the remaining values in last section
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
   thread threads[nthreads];
   for (long i = 0; i < nthreads; i++)
   {
-    threads[i] = thread(thread_merge_sort, i);
+    threads[i] = thread(thread_level_sort, i);
   }
 
   for (long i = 0; i < nthreads; i++)
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     threads[i].join();
   }
 
-  merge_sections_of_array(arr, nthreads, 1, thread_section, n);
+  merge_thread_sections(arr, nthreads, 1, thread_section, n);
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
   std::chrono::duration<double> elpased_seconds = end - start;
   std::cerr << elpased_seconds.count() << std::endl;
