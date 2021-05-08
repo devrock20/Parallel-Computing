@@ -50,21 +50,23 @@ int main(int argc, char *argv[])
   int *arr = new int[n];
   generateMergeSortData(arr, n);
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
-  OmpLoop obj;
-  obj.setNbThread(nthreads);
+  // printArr(arr, n);
   bool swapped = true;
   while (swapped)
   {
     swapped = false;
-    obj.parfor(1,n-1,2,[&](int i) -> void {
+    staticFor(
+        1, n - 1, 2, nthreads,
+        [&](int i) -> void {
           if (arr[i] > arr[i + 1])
           {
             swap(arr, i, i + 1);
             swapped = true;
           }
         });
-
-    obj.parfor(0,n-1,2,[&](int i) -> void {
+    staticFor(
+        0, n - 1, 2, nthreads,
+        [&](int i) -> void {
           if (arr[i] > arr[i + 1])
           {
             swap(arr, i, i + 1);
