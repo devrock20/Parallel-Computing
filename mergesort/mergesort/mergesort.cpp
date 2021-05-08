@@ -28,8 +28,8 @@ void merge(int arr[], int left, int middle, int right)
   int k = 0;
   int left_length = middle - left + 1;
   int right_length = right - middle;
-  int left_array[left_length];
-  int right_array[right_length];
+  int *left_array = new int[left_length];
+  int *right_array = new int[right_length];
 
   /* copy values to left array */
   for (int i = 0; i < left_length; i++)
@@ -74,6 +74,8 @@ void merge(int arr[], int left, int middle, int right)
     k++;
     j++;
   }
+  delete[] left_array;
+  delete[] right_array;
 }
 
 void merge_sort(int arr[], int left, int right)
@@ -94,6 +96,9 @@ void merge_sections_of_array(int arr[], int number, int aggregation, int NUMBERS
     int left = i * (NUMBERS_PER_THREAD * aggregation);
     int right = ((i + 2) * NUMBERS_PER_THREAD * aggregation) - 1;
     int middle = left + (NUMBERS_PER_THREAD * aggregation) - 1;
+    if(left >=n) {
+      break;
+    }
     if (right >= n)
     {
       right = n - 1;
