@@ -20,94 +20,104 @@ extern "C"
 }
 #endif
 
-/* merge function */
-void merge(int arr[], int left, int middle, int right)
+// conventional merge function
+void merge(int arr[], int leftIndex, int middleIndex, int rightIndex)
 {
   int i = 0;
   int j = 0;
   int k = 0;
-  int left_length = middle - left + 1;
-  int right_length = right - middle;
-  int *left_array = new int[left_length];
-  int *right_array = new int[right_length];
+  int leftIndex_length = middleIndex - leftIndex + 1;
+  int rightIndex_length = rightIndex - middleIndex;
 
-  /* copy values to left array */
-  for (int i = 0; i < left_length; i++)
+  //creating dummy arrays to hold temp values
+  int *leftIndex_array = new int[leftIndex_length];
+  int *rightIndex_array = new int[rightIndex_length];
+
+  //copy value to left array
+  for (int i = 0; i < leftIndex_length; i++)
   {
-    left_array[i] = arr[left + i];
+    leftIndex_array[i] = arr[leftIndex + i];
   }
 
-  /* copy values to right array */
-  for (int j = 0; j < right_length; j++)
+  //copy values to right array
+  for (int j = 0; j < rightIndex_length; j++)
   {
-    right_array[j] = arr[middle + 1 + j];
+    rightIndex_array[j] = arr[middleIndex + 1 + j];
   }
 
   i = 0;
   j = 0;
-  /** chose from right and left arrays and copy */
-  while (i < left_length && j < right_length)
+  // select and copy to original array
+  while (i < leftIndex_length && j < rightIndex_length)
   {
-    if (left_array[i] <= right_array[j])
+    if (leftIndex_array[i] <= rightIndex_array[j])
     {
-      arr[left + k] = left_array[i];
+      arr[leftIndex + k] = leftIndex_array[i];
       i++;
     }
     else
     {
-      arr[left + k] = right_array[j];
+      arr[leftIndex + k] = rightIndex_array[j];
       j++;
     }
     k++;
   }
 
-  /* copy the remaining values to the array */
-  while (i < left_length)
+  // copy reset
+  while (i < leftIndex_length)
   {
-    arr[left + k] = left_array[i];
+    arr[leftIndex + k] = leftIndex_array[i];
     k++;
     i++;
   }
-  while (j < right_length)
+  while (j < rightIndex_length)
   {
-    arr[left + k] = right_array[j];
+    arr[leftIndex + k] = rightIndex_array[j];
     k++;
     j++;
   }
-  delete[] left_array;
-  delete[] right_array;
+  //deallocate array
+  delete[] leftIndex_array;
+  delete[] rightIndex_array;
 }
 
-void merge_sort(int arr[], int left, int right)
+// conventional mergeSort function
+void merge_sort(int arr[], int leftIndex, int rightIndex)
 {
-  if (left < right)
+  if (leftIndex < rightIndex)
   {
-    int middle = left + (right - left) / 2;
-    merge_sort(arr, left, middle);
-    merge_sort(arr, middle + 1, right);
-    merge(arr, left, middle, right);
+    int middleIndex = leftIndex + (rightIndex - leftIndex) / 2;
+    merge_sort(arr, leftIndex, middleIndex);
+    merge_sort(arr, middleIndex + 1, rightIndex);
+    merge(arr, leftIndex, middleIndex, rightIndex);
   }
 }
 
-void merge_sections_of_array(int arr[], int number, int aggregation, int NUMBERS_PER_THREAD, int n)
+// since sections of the array are sorted by threads, now the sorted arrays needs to be sorted
+//starting from 2 sections and all the way to complete sections
+void merge_sections_of_array(int arr[], int nthreads, int aggregation, int thread_section, int n)
 {
-  for (int i = 0; i < number; i = i + 2)
+  for (int i = 0; i < nthreads; i = i + 2)
   {
-    int left = i * (NUMBERS_PER_THREAD * aggregation);
-    int right = ((i + 2) * NUMBERS_PER_THREAD * aggregation) - 1;
-    int middle = left + (NUMBERS_PER_THREAD * aggregation) - 1;
-    if(left >=n) {
+    int leftIndex = i * (thread_section * aggregation);
+    int rightIndex = ((i + 2) * thread_section * aggregation) - 1;
+    int middleIndex = leftIndex + (thread_section * aggregation) - 1;
+    //if leftIndex is out of bound there is no point of progressing forward
+    if(leftIndex >=n) {
       break;
     }
-    if (right >= n)
+    //if rightIndex is out of bound adjust it to higher bound
+    if (rightIndex >= n)
     {
-      right = n - 1;
+      rightIndex = n - 1;
     }
-    merge(arr, left, middle, right);
+    // perform a traditional merge
+    merge(arr, leftIndex, middleIndex, rightIndex);
   }
-  if (number / 2 >= 1)
+  if (nthreads / 2 >= 1)
   {
-    merge_sections_of_array(arr, number / 2, aggregation * 2, NUMBERS_PER_THREAD, n);
+    // if the threads more than 1 that means there are sections of merge that are yet to be merged.
+    merge_sections_of_array(arr, nthreads / 2, aggregation * 2, thread_section, n);
   }
 }
 
@@ -124,26 +134,28 @@ int main(int argc, char *argv[])
   int nthreads = atoi(argv[2]);
   // get arr data
   int *arr = new int[n];
-  const int NUMBERS_PER_THREAD = n / nthreads;
-  const int OFFSET = n % nthreads;
+  const int thread_section = n / nthreads;
+  const int offset = n % nthreads;
   generateMergeSortData(arr, n);
 
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
+
   auto thread_merge_sort = [&](int thread_id) -> void {
-    int left = thread_id * (NUMBERS_PER_THREAD);
-    int right = (thread_id + 1) * (NUMBERS_PER_THREAD)-1;
+    int leftIndex = thread_id * (thread_section);
+    int rightIndex = (thread_id + 1) * (thread_section)-1;
+    // adjust the remaining values in last section
     if (thread_id == nthreads - 1)
     {
-      right += OFFSET;
+      rightIndex += offset;
     }
-    int middle = left + (right - left) / 2;
-    if (left < right)
+    int middleIndex = leftIndex + (rightIndex - leftIndex) / 2;
+    //perform a normal merge per thread on a section of original array
+    if (leftIndex < rightIndex)
     {
-      merge_sort(arr, left, right);
-      merge_sort(arr, left + 1, right);
-      merge(arr, left, middle, right);
+      merge_sort(arr, leftIndex, rightIndex);
+      merge_sort(arr, leftIndex + 1, rightIndex);
+      merge(arr, leftIndex, middleIndex, rightIndex);
     }
-    // return NULL;
   };
 
   thread threads[nthreads];
@@ -157,7 +169,7 @@ int main(int argc, char *argv[])
     threads[i].join();
   }
 
-  merge_sections_of_array(arr, nthreads, 1, NUMBERS_PER_THREAD, n);
+  merge_sections_of_array(arr, nthreads, 1, thread_section, n);
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
   std::chrono::duration<double> elpased_seconds = end - start;
   std::cerr << elpased_seconds.count() << std::endl;
