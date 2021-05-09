@@ -22,23 +22,18 @@ public:
     nbthread = t;
   }
 
-  // template<typename TLS>
+  //modified parfor to handle 2 variables
   void parfor(size_t beg1, size_t beg2,
               std::function<bool(int, int)> condt,
               std::function<void(int, int)> f)
   {
-#pragma omp parallel num_threads(nbthread)
+    #pragma omp parallel num_threads(nbthread)
     {
-      // TLS tls;
-      // before(tls);
-
-#pragma omp for schedule(static)
+      #pragma omp for schedule(static)
      for (int i = beg1, j = beg2; condt(i, j); i--,j++)
       {
         f(i,j);
       }
-      // #pragma omp critical
-      // after(tls);
     }
   }
 };
