@@ -20,18 +20,6 @@ extern "C"
 }
 #endif
 
-void printArr(int **arr, int m, int n)
-{
-  for (int i = 0; i < m; i++)
-  {
-    for (int j = 0; j < n; j++)
-    {
-      cout << arr[i][j] << "\t";
-    }
-    cout << endl;
-  }
-}
-
 int main(int argc, char *argv[])
 {
   if (argc < 3)
@@ -44,33 +32,27 @@ int main(int argc, char *argv[])
   int nthreads = atoi(argv[2]);
   int *arr = new int[n];
   generatePrefixSumData(arr, n);
-  chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
   int *pr = new int[n + 1];
-OmpLoop obj;
-obj.setNbThread(nthreads);
+  OmpLoop obj;
+  obj.setNbThread(nthreads);
   int levels = log2(n) + 1;
-
+  //initalizing table for a dynamic approach
   int **multilevelArr = new int *[levels + 2];
   for (int i = 0; i < levels + 2; ++i)
     multilevelArr[i] = new int[n];
 
-  for (int i = 0; i < n; i++)
-  {
+  //copying elements from arr to first row
+  for (int i = 0; i < n; i++) {
     multilevelArr[0][i] = arr[i];
   }
-
+  
   for (int level = 1; level <= levels; level++)
   {
+    //copying values from before row  
     obj.parfor(0,n,1,[&](int i)->void{
       multilevelArr[level][i] = multilevelArr[level - 1][i];
     });
-    // staticFor(0,n,1,nthreads,[&](int i)->void{
-    //   multilevelArr[level][i] = multilevelArr[level - 1][i];
-    // });
-    // for (int i = 0; i < n; i++)
-    // {
-    //   multilevelArr[level][i] = multilevelArr[level - 1][i];
-    // }
+    //prefixing sum
     obj.parfor(pow(2, level - 1), n, 1,[&](int k) -> void {
       if (k >= pow(2, level - 1))
       {
@@ -78,47 +60,18 @@ obj.setNbThread(nthreads);
         multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
       }
     });
-    // staticFor(pow(2, level - 1), n, 1, nthreads, [&](int k) -> void {
-    //   if (k >= pow(2, level - 1))
-    //   {
-    //     int index = k - pow(2, level - 1);
-    //     multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
-    //   }
-    // });
   }
 
-  /**
-   * please ignore below
-  */
-  // for (int level = 1; level <= levels; level++)
-  // {
-
-  //   for (int i = 0; i < n; i++)
-  //   {
-  //     multilevelArr[level][i] = multilevelArr[level - 1][i];
-  //   }
-
-  //   for (int k = pow(2, level - 1); k < n; k++)
-  //   {
-  //     if (k >= pow(2, level - 1))
-  //     {
-  //       int index = k - pow(2, level - 1);
-  //       multilevelArr[level][k] = multilevelArr[level - 1][index] + multilevelArr[level - 1][k];
-  //     }
-  //   }
-  // }
+  chrono::time_point<chrono::system_clock> end = chrono::system_clock::now();
   pr[0] = 0;
+  //constructing the original array
   for (int i = 0; i < n; i++)
   {
     pr[i + 1] = multilevelArr[levels][i];
   }
-  chrono::time_point<chrono::system_clock> end = chrono::system_clock::now();
-
+  delete[][] multilevelArr;
   chrono::duration<double> elapsed_seconds = end - start;
-
   cerr << elapsed_seconds.count() << endl;
-
   checkPrefixSumResult(pr, n);
-
   return 0;
 }
