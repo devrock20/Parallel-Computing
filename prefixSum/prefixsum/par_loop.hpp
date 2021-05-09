@@ -20,12 +20,19 @@ public:
   }
 
   void parfor (size_t beg, size_t end, size_t increment, std::function<void(int)> f) {
-	#pragma omp parallel num_threads(nbthread) {
-	#pragma omp for schedule(static) 
-	for (size_t i=beg; i<end; i+= increment) {
-		f(i);
-	}
-     }
+	{
+#pragma omp parallel num_threads(nbthread)
+    {
+      //TLS tls;
+     // before(tls);
+      
+#pragma omp for schedule(static) 
+      for (size_t i=beg; i<end; i+= increment) {
+	f(i);
+      }
+#pragma omp critical
+      //after(tls);
+    }
   }
 };
 

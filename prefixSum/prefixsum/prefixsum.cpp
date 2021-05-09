@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
   {
     pr[i + 1] = multilevelArr[levels][i];
   }
-  delete[][] multilevelArr;
+  //delete[][] multilevelArr;
   chrono::duration<double> elapsed_seconds = end - start;
   cerr << elapsed_seconds.count() << endl;
   checkPrefixSumResult(pr, n);

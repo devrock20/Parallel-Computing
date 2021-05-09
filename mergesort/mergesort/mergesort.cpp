@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sys/time.h>
 #include <iostream>
+#include "par_loop.hpp"
 using namespace std;
 #ifdef __cplusplus
 extern "C"
@@ -94,17 +95,13 @@ void merge_sort(int arr[], int leftIndex, int rightIndex)
 
 // since sections of the array are sorted by threads, now the sorted arrays needs to be sorted
 //starting from 2 sections and all the way to complete sections
-void merge_thread_sections(int arr[], int nthreads, int aggregation, int thread_section, int n)
+void merge_thread_sections(int arr[], int nthreads, int selection, int thread_section, int n)
 {
-  parFor(0,nthreads,2, [&](int i)->void{
+  parFor(0,nthreads,2,nthreads, [&](int i)->void{
     {
-      int leftIndex = i * (thread_section * aggregation);
-      int rightIndex = ((i + 2) * thread_section * aggregation) - 1;
-      int middleIndex = leftIndex + (thread_section * aggregation) - 1;
-      //if leftIndex is out of bound there is no point of progressing forward
-      if(leftIndex >=n) {
-        break;
-      }
+      int leftIndex = i * (thread_section * selection);
+      int rightIndex = ((i + 2) * thread_section * selection) - 1;
+      int middleIndex = leftIndex + (thread_section * selection) - 1;
       //if rightIndex is out of bound adjust it to higher bound
       if (rightIndex >= n)
       {
@@ -115,10 +112,10 @@ void merge_thread_sections(int arr[], int nthreads, int aggregation, int thread_
     }
   });
   
-  if (nthreads / 2 >= 1)
+  if (nthreads > 1)
   {
     // if the threads more than 1 that means there are sections of merge that are yet to be merged.
-    merge_thread_sections(arr, nthreads / 2, aggregation * 2, thread_section, n);
+    merge_thread_sections(arr, nthreads / 2, selection * 2, thread_section, n);
   }
 }
 
@@ -159,7 +156,7 @@ int main(int argc, char *argv[])
     }
   };
 
-  parFor(0, nthreads,1, thread_level_sort);
+  parFor(0, nthreads,1,nthreads, thread_level_sort);
 
   merge_thread_sections(arr, nthreads, 1, thread_section, n);
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();

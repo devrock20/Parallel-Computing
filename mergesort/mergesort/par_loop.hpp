@@ -18,7 +18,7 @@ void simpleFor(size_t beg, size_t end, size_t inc,
   }
 }
 
-void parFor(size_t beg, size_t end, size_t inc,
+void parFor(size_t beg, size_t end, size_t inc, int nthreads,
                std::function<void(int)> f) {
     thread threads[nthreads];
   for (long i = beg; i < end; i+=inc)
