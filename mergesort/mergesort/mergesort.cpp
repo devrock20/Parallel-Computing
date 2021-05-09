@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <thread>
 #include <sys/time.h>
 #include <iostream>
 using namespace std;
@@ -97,23 +96,25 @@ void merge_sort(int arr[], int leftIndex, int rightIndex)
 //starting from 2 sections and all the way to complete sections
 void merge_thread_sections(int arr[], int nthreads, int aggregation, int thread_section, int n)
 {
-  for (int i = 0; i < nthreads; i = i + 2)
-  {
-    int leftIndex = i * (thread_section * aggregation);
-    int rightIndex = ((i + 2) * thread_section * aggregation) - 1;
-    int middleIndex = leftIndex + (thread_section * aggregation) - 1;
-    //if leftIndex is out of bound there is no point of progressing forward
-    if(leftIndex >=n) {
-      break;
-    }
-    //if rightIndex is out of bound adjust it to higher bound
-    if (rightIndex >= n)
+  parFor(0,nthreads,2, [&](int i)->void{
     {
-      rightIndex = n - 1;
+      int leftIndex = i * (thread_section * aggregation);
+      int rightIndex = ((i + 2) * thread_section * aggregation) - 1;
+      int middleIndex = leftIndex + (thread_section * aggregation) - 1;
+      //if leftIndex is out of bound there is no point of progressing forward
+      if(leftIndex >=n) {
+        break;
+      }
+      //if rightIndex is out of bound adjust it to higher bound
+      if (rightIndex >= n)
+      {
+        rightIndex = n - 1;
+      }
+      // perform a traditional merge
+      merge(arr, leftIndex, middleIndex, rightIndex);
     }
-    // perform a traditional merge
-    merge(arr, leftIndex, middleIndex, rightIndex);
-  }
+  });
+  
   if (nthreads / 2 >= 1)
   {
     // if the threads more than 1 that means there are sections of merge that are yet to be merged.
@@ -158,16 +159,7 @@ int main(int argc, char *argv[])
     }
   };
 
-  thread threads[nthreads];
-  for (long i = 0; i < nthreads; i++)
-  {
-    threads[i] = thread(thread_level_sort, i);
-  }
-
-  for (long i = 0; i < nthreads; i++)
-  {
-    threads[i].join();
-  }
+  parFor(0, nthreads,1, thread_level_sort);
 
   merge_thread_sections(arr, nthreads, 1, thread_section, n);
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
