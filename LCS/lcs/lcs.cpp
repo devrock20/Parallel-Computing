@@ -34,72 +34,29 @@ int LCS(char *X, int m, char *Y, int n, int nthreads)
     C[0][j] = 0;
   }
 
-  // for (int i = 0; i < m; i++)
-  // {
-  //   cout << X[i] << "\t";
-  // }
-  // cout << endl;
-  // for (int j = 0; j < m; j++)
-  // {
-  //   cout << Y[j] << "\t";
-  // }
-
-  // cout << endl;
   auto func = [&](int i, int j) -> void {
     if (X[i] == Y[j])
     {
-      // cout << i << "|" << j << " +1" << endl;
-
       C[i + 1][j + 1] = C[i][j] + 1;
     }
     else
     {
-      // cout << i << "|" << j << " max";
       C[i + 1][j + 1] = std::max(C[i][j + 1], C[i + 1][j]);
     }
   };
   OmpLoop obj;
   obj.setNbThread(nthreads);
+  //top to disgonal
   for (int k = 1; k < m; k++)
   {
-    // int i = k, j = 1;
-    // staticFor(
-    //     0, 0, [&]() -> bool { return i > 0 && j < n; }, 0, nthreads, [&]() -> void {
-    //   func(i, j);
-    //   i--; });
-    // int i = k, j = 1;
     obj.parfor(
         k, 1,
         [&](int i, int j) -> bool { return i > 0 && j < n; },
         [&](int i, int j) -> void {
           func(i, j);
         });
-    // parfor(
-    //     k, 1,
-    //     [&](int i, int j) -> bool { return i > 0 && j < n; },
-    //     // [](int i, int j) -> void { i--, j++; },
-    //     [&](int i, int j) -> void {
-    //       func(i, j);
-    //       //             for (int i = 0; i <= m; i++)
-    //       // {
-    //       //   for (int j = 0; j <= n; j++)
-    //       //   {
-    //       //     cout << C[i][j] << "\t";
-    //       //   }
-    //       //   cout << endl;
-    //       // }
-    //     },
-    //     nthreads);
-    // for (int i = k, j = 1;i > 0 && j < n; ; i--, j++)
-    // {
-    //   func(i, j);
-    // }
-    // cout << endl;
-    // cout << "row number" << k << endl;
   }
-  // cout << endl;
-
-  // cout << "phase 2" << endl;
+  //diagonal to bottom
   for (int c = 1; c < n; c++)
   {
     obj.parfor(
@@ -108,53 +65,14 @@ int LCS(char *X, int m, char *Y, int n, int nthreads)
         [&](int i, int j) -> void {
           func(i, j);
         });
-    // parfor(
-    //     m - 1, c,
-    //     [&](int i, int j) -> bool { return i > 0 && j < n; },
-    //     [](int i, int j) -> void { i--, j++; },
-    //     [&](int i, int j) -> void {
-    //       func(i, j);
-    //     },
-    //     nthreads);
-    // for (int j = c, i = m - 1; j < n && i > 0; j++, i--)
-    // {
-    // func(i,j);
-
-    // if (X[i] == Y[j])
-    // {
-    //   cout << i << "|" << j << " +1" << endl;
-
-    //   C[i + 1][j + 1] = C[i][j] + 1;
-    // }
-    // else
-    // {
-    //   // cout << i << "|" << j << " max";
-    //   C[i + 1][j + 1] = std::max(C[i][j + 1], C[i + 1][j]);
-    // }
-    // }
-    // cout << endl;
-    // cout << "column number" << c << endl;
   }
 
   int result = C[m][n];
-  // cout << "Finish" << result << endl;
-  // for (int i = 0; i <= m; i++)
-  // {
-  //   for (int j = 0; j <= n; j++)
-  //   {
-  //     cout << C[i][j] << "\t";
-  //   }
-  //   cout << endl;
-  // }
-
-  // cout << "Rsult" << m-1 << n-1 << "\t" << C[m-1][n-1] << endl;
-
   for (int i = 0; i <= m; ++i)
   {
     delete[] C[i];
   }
   delete[] C;
-
   return result;
 }
 
@@ -176,22 +94,17 @@ int main(int argc, char *argv[])
   char *Y = new char[n];
   generateLCS(X, m, Y, n);
 
-  // cout << endl;
-  //insert LCS code here.
   std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 
   int lcs = LCS(X, m, Y, n, nthreads);
-  // cout << lcs << "Resultasdasd" << endl;
   std::chrono::time_point<std::chrono::system_clock> end = std::chrono::system_clock::now();
   std::chrono::duration<double> elpased_seconds = end - start;
 
-  // checkLCS(X, m, Y, n, lcs);
   std::cerr << elpased_seconds.count() << std::endl;
 
   delete[] X;
   delete[] Y;
 
-  // int result = -1; // length of common subsequence
   checkLCS(X, m, Y, n, lcs);
 
   return 0;
