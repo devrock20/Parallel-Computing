@@ -16,7 +16,7 @@ then
 fi
 
 
-qsub -q mamba -d $(pwd) -l walltime=02:00:00,nodes=1:ppn=16 bench_lcs.sh
+qsub -q mamba -d $(pwd) -l walltime=06:00:00,nodes=1:ppn=16 bench_lcs.sh
 echo "----------------------"
 echo
 echo "Once the job COMPLETES, plot with \`make plot\`"
