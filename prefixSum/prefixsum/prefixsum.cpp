@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   int **multilevelArr = new int *[levels + 2];
   for (int i = 0; i < levels + 2; ++i)
     multilevelArr[i] = new int[n];
-
+  chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
   //copying elements from arr to first row
   for (int i = 0; i < n; i++) {
     multilevelArr[0][i] = arr[i];
